@@ -1,16 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/elf.h>
+
 #include "elf_analyzer.h"
-
-#define FREE_IF_EXIST(ptr) \
-    if ((ptr) != NULL) free(ptr);
-
-FILE *fp;
-Elf64_Ehdr *p_ehdr64;
-Elf64_Phdr *p_ptbl64;
-Elf64_Shdr *p_stbl64;
-Elf64_Shdr *p_shstr64;
+#include "analy_ctrl.h"
 
 int
 load() {
@@ -23,9 +16,9 @@ load() {
 
 int
 release() {
-    FREE_IF_EXIST(p_ehdr64);
-    FREE_IF_EXIST(p_ptbl64);
-    FREE_IF_EXIST(p_stbl64);
+    release_ehdr();
+    release_ptbl();
+    release_stbl();
     return 0;
 }
 
@@ -37,9 +30,7 @@ main(int argc, char* argv[]) {
     }
 
     char *fname = argv[1];
-    fp = fopen(fname, "rb");
-    if (fp == NULL) {
-        perror(argv[1]);
+    if (elf_open(fname) == -1) {
         return -1;
     }
 
@@ -47,6 +38,7 @@ main(int argc, char* argv[]) {
     repl();
     release();
 
-    fclose(fp);
+    close_elf();
+
     return 0;
 }
