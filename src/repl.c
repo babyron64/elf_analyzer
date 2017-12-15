@@ -22,18 +22,18 @@ repl() {
 static int
 loop() {
     char cmd[128];
-    Tok toks[MAX_TOK_NUM];
     int res;
 
     while (1) {
+        Tok toks[MAX_TOK_NUM] = {0};
         printf("(elf_analyzer) ");
-        scanf("%s", cmd);
+        fgets(cmd, 128, stdin);
         read_toks(toks, cmd);
         res = eval(toks);
         if (res == 1)
             break;
         if (res == -1)
-            fprintf(stderr, "command execution failure");
+            fprintf(stderr, "command execution failure: %u\n", toks[0]);
     }
 
     return 0;
@@ -48,6 +48,7 @@ read_toks(Tok *toks, char *inputs) {
     while (1) {
         if (p == NULL || i == MAX_TOK_NUM)
             break;
+        for (char *q=p; *q!='\0'; q++) if (*q=='\n') *q='\0';
         tok = get_tok(p);
         if (tok == -1)
             return -1;
@@ -80,15 +81,13 @@ get_tok(const char *cmd) {
     return -1;
 }
 
+/*** researved for debug purposes ***/
 static int
 print_info() {
     const Elf64_Ehdr *p_ehdr64 = get_ehdr();
     const Elf64_Shdr *p_shstr64 = get_shstr();
 
-    printf("entry point: %llx\n", p_ehdr64->e_entry);
-    char buf[16];
-    read_sec_name(buf, p_shstr64, 16);
-    printf("string section name: %s\n",buf);
-    print_ehdr();
+    // Your code here
+
     return 0;
 }

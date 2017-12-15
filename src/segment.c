@@ -34,6 +34,11 @@ get_phdr(Elf64_Half ndx) {
 
 int
 print_phdr(const Elf64_Phdr *pp) {
+    printf("--- PROGRAM HEADER ENTRY ---\n");
+    if (pp == NULL) {
+        printf("No entry exists\n");
+        return -1;
+    }
     PRINT_STC(pp, p_type, %x);
     PRINT_STC(pp, p_flags, %x);
     PRINT_STC(pp, p_offset, %llx);

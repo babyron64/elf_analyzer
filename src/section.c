@@ -34,6 +34,11 @@ get_shdr(Elf64_Half ndx) {
 
 int
 print_shdr(const Elf64_Shdr *ps) {
+    printf("--- SECTION HEADER ENTRY ---\n");
+    if (ps == NULL) {
+        printf("No entry exists\n");
+        return -1;
+    }
     PRINT_STC(ps, sh_name, %x);
     PRINT_STC(ps, sh_type, %x);
     PRINT_STC(ps, sh_flags, %llx);

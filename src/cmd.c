@@ -16,24 +16,26 @@ int eval(Tok toks[]) {
     switch (toks[0]) {
         case QUIT:
             res = 1;
+            break;
         case EHDR:
-            res = eval_ehdr(toks++);
+            res = eval_ehdr(++toks);
             break;
         case PHDR:
-            res = eval_phdr(toks++);
+            res = eval_phdr(++toks);
             break;
         case SHDR:
-            res = eval_shdr(toks++);
+            res = eval_shdr(++toks);
             break;
         case SEG:
-            res = eval_seg(toks++);
+            res = eval_seg(++toks);
             break;
         case SEC:
-            res = eval_sec(toks++);
+            res = eval_sec(++toks);
             break;
         default:
             eval_error("unknown command");
             res = -1;
+            break;
     }
     return res;
 }
@@ -57,7 +59,7 @@ eval_ehdr(Tok toks[]) {
 static int
 eval_phdr(Tok toks[]) {
     if (toks[1] != 0) {
-        eval_error("ehdr: Too many arguments");
+        eval_error("phdr: Too many arguments");
         return -1;
     }
     print_phdr(get_phdr(toks[0]));
@@ -67,7 +69,7 @@ eval_phdr(Tok toks[]) {
 static int
 eval_shdr(Tok toks[]) {
     if (toks[1] != 0) {
-        eval_error("ehdr: Too many arguments");
+        eval_error("shdr: Too many arguments");
         return -1;
     }
     print_shdr(get_shdr(toks[0]));
@@ -77,7 +79,7 @@ eval_shdr(Tok toks[]) {
 static int
 eval_seg(Tok toks[]) {
     if (toks[1] != 0) {
-        eval_error("ehdr: Too many arguments");
+        eval_error("seg: Too many arguments");
         return -1;
     }
     return -1;
@@ -86,7 +88,7 @@ eval_seg(Tok toks[]) {
 static int
 eval_sec(Tok toks[]) {
     if (toks[1] != 0) {
-        eval_error("ehdr: Too many arguments");
+        eval_error("sec: Too many arguments");
         return -1;
     }
     return -1;

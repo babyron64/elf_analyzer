@@ -27,6 +27,11 @@ get_ehdr() {
 
 int
 print_ehdr() {
+    printf("--- ELF HEADER ---\n");
+    if (p_ehdr64 == NULL) {
+        printf("No entry exists\n");
+        return -1;
+    }
     PRINT_STC(p_ehdr64, e_type, %hx);
     PRINT_STC(p_ehdr64, e_machine, %hx);
     PRINT_STC(p_ehdr64, e_version, %x);
