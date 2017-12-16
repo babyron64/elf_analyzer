@@ -13,9 +13,12 @@ OBJS+=$(BIN)/elfhdr.o $(BIN)/segment.o $(BIN)/section.o $(BIN)/shstr.o
 
 OUTPUT=./analyelf.out
 
-.PHONY: all
+.PHONY: all clean
 
 all: $(OUTPUT)
+
+clean:
+	rm bin/* analyelf.out
 
 $(OUTPUT): $(OBJS)
 	$(CC) $(FLAGS) $(OBJS) -o $(OUTPUT)
