@@ -6,11 +6,8 @@
 #include "analy_ctrl.h"
 #include "elf_analyzer.h"
 
-#define MAX_TOK_NUM 4
-
 static int loop();
-static int read_toks(Tok *toks, char *inputs);
-static Tok get_tok(const char *cmd);
+static int parse_line(char cmds[][MAX_TOK_NUM], char *line);
 static int print_info();
 
 int
@@ -21,26 +18,24 @@ repl() {
 
 static int
 loop() {
-    char cmd[128];
-    int res;
+    char line[128];
 
     while (1) {
-        Tok toks[MAX_TOK_NUM] = {0};
+        char cmds[MAX_CMD_LEN][MAX_TOK_NUM] = {{0}};
+        int res;
         printf("(elf_analyzer) ");
-        fgets(cmd, 128, stdin);
-        read_toks(toks, cmd);
-        res = eval(toks);
+        fgets(line, 128, stdin);
+        parse_line(cmds, line);
+        res = eval(cmds);
         if (res == 1)
             break;
-        if (res == -1)
-            fprintf(stderr, "command execution failure: %u\n", toks[0]);
     }
 
     return 0;
 }
 
 static int
-read_toks(Tok *toks, char *inputs) {
+parse_line(char cmds[][MAX_TOK_NUM], char *inputs) {
     char *p = strtok(inputs, " ");
     Tok tok;
 
@@ -49,36 +44,11 @@ read_toks(Tok *toks, char *inputs) {
         if (p == NULL || i == MAX_TOK_NUM)
             break;
         for (char *q=p; *q!='\0'; q++) if (*q=='\n') *q='\0';
-        tok = get_tok(p);
-        if (tok == -1)
-            return -1;
-        toks[i++] = tok;
+        strcpy(cmds[i++], p);
         p = strtok(NULL, " ");
     }
 
     return 0;
-}
-
-static Tok
-get_tok(const char *cmd) {
-    int num = atoi(cmd);
-    if (0 < num && num < MAX_NUMERIC)
-        return num;
-    else if (strcmp(cmd, "0") == 0)
-        return 0;
-    else if (strcmp(cmd, "quit") == 0)
-        return QUIT;
-    else if (strcmp(cmd, "ehdr") == 0)
-        return EHDR;
-    else if (strcmp(cmd, "phdr") == 0)
-        return PHDR;
-    else if (strcmp(cmd, "shdr") == 0)
-        return SHDR;
-    else if (strcmp(cmd, "seg") == 0)
-        return SEG;
-    else if (strcmp(cmd, "sec") == 0)
-        return SEC;
-    return -1;
 }
 
 /*** researved for debug purposes ***/

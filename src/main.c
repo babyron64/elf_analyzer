@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <linux/elf.h>
 
 #include "elf_analyzer.h"
@@ -35,7 +36,17 @@ main(int argc, char* argv[]) {
     }
 
     load();
-    repl();
+    if (argc == 2)
+        repl();
+    else {
+        if (argc-2 > MAX_TOK_NUM)
+            fprintf(stderr, "Too many arguments\n");
+        char cmds[MAX_CMD_LEN][MAX_TOK_NUM] = {{0}};
+        for (int i=0; i<argc-2; i++)
+            strcpy(cmds[i], argv[i+2]); 
+        eval(cmds);
+    }
+
     release();
 
     close_elf();
