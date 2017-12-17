@@ -7,7 +7,7 @@
 #include "elf_analyzer.h"
 
 static int loop();
-static int parse_line(char cmds[][MAX_TOK_NUM], char *line);
+static int parse_line(char cmds[][MAX_CMD_LEN], char *line);
 static int print_info();
 
 int
@@ -21,7 +21,7 @@ loop() {
     char line[128];
 
     while (1) {
-        char cmds[MAX_CMD_LEN][MAX_TOK_NUM] = {{0}};
+        char cmds[MAX_TOK_NUM][MAX_CMD_LEN] = {{0}};
         int res;
         printf("(elf_analyzer) ");
         fgets(line, 128, stdin);
@@ -35,7 +35,7 @@ loop() {
 }
 
 static int
-parse_line(char cmds[][MAX_TOK_NUM], char *inputs) {
+parse_line(char cmds[][MAX_CMD_LEN], char *inputs) {
     char *p = strtok(inputs, " ");
     Tok tok;
 

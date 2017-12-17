@@ -7,9 +7,10 @@
 #include "analy_elf.h"
 #include "analy_sec.h"
 #include "analy_seg.h"
+#include "analy_utils.h"
 
-#define PRINT_STC(ptr, name, format) \
-    printf( #name ": " #format "\n", ptr -> name );
+#define PRINT_STC(ptr, name, format, suffix) \
+    printf( #name ":\t"  #format #suffix "\n", ptr -> name );
 
 #define FREE_IF_EXIST(ptr) \
     if ((ptr) != NULL) free(ptr);

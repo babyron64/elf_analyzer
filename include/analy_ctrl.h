@@ -3,7 +3,7 @@
 
 #define MAX_NUMERIC 40000
 #define MAX_CMD_LEN 8
-#define MAX_TOK_NUM 4
+#define MAX_TOK_NUM 8
 
 
 int elf_open(char *fname);
@@ -15,10 +15,13 @@ typedef enum {
     SHDR,
     PHDR,
     SEG,
-    SEC
+    SEC,
+    LIST,
+    DUMP,
+    B, H
 } Tok;
 
 int repl();
-int eval(char cmds[][MAX_TOK_NUM]);
+int eval(char cmds[][MAX_CMD_LEN]);
 
 #endif

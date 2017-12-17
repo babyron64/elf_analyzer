@@ -41,7 +41,7 @@ main(int argc, char* argv[]) {
     else {
         if (argc-2 > MAX_TOK_NUM)
             fprintf(stderr, "Too many arguments\n");
-        char cmds[MAX_CMD_LEN][MAX_TOK_NUM] = {{0}};
+        char cmds[MAX_TOK_NUM][MAX_CMD_LEN] = {{0}};
         for (int i=0; i<argc-2; i++)
             strcpy(cmds[i], argv[i+2]); 
         eval(cmds);

@@ -32,19 +32,19 @@ print_ehdr() {
         printf("No entry exists\n");
         return -1;
     }
-    PRINT_STC(p_ehdr64, e_type, %hx);
-    PRINT_STC(p_ehdr64, e_machine, %hx);
-    PRINT_STC(p_ehdr64, e_version, %x);
-    PRINT_STC(p_ehdr64, e_entry, %llx);
-    PRINT_STC(p_ehdr64, e_phoff, %llx);
-    PRINT_STC(p_ehdr64, e_shoff, %llx);
-    PRINT_STC(p_ehdr64, e_flags, %x);
-    PRINT_STC(p_ehdr64, e_ehsize, %hx);
-    PRINT_STC(p_ehdr64, e_phentsize, %hx);
-    PRINT_STC(p_ehdr64, e_phnum, %hx);
-    PRINT_STC(p_ehdr64, e_shentsize, %hx);
-    PRINT_STC(p_ehdr64, e_shnum, %hx);
-    PRINT_STC(p_ehdr64, e_shstrndx, %hx);
+    PRINT_STC(p_ehdr64, e_type, %hx, h);
+    PRINT_STC(p_ehdr64, e_machine, %hx, h);
+    PRINT_STC(p_ehdr64, e_version, %d, );
+    PRINT_STC(p_ehdr64, e_entry, %llx, h);
+    PRINT_STC(p_ehdr64, e_phoff, %llx, h);
+    PRINT_STC(p_ehdr64, e_shoff, %llx, h);
+    PRINT_STC(p_ehdr64, e_flags, %x, h);
+    PRINT_STC(p_ehdr64, e_ehsize, %hd, );
+    PRINT_STC(p_ehdr64, e_phentsize, %hd, );
+    PRINT_STC(p_ehdr64, e_phnum, %hd, );
+    PRINT_STC(p_ehdr64, e_shentsize, %hd, );
+    PRINT_STC(p_ehdr64, e_shnum, %hd, );
+    PRINT_STC(p_ehdr64, e_shstrndx, %hd, );
     
     return 0;
 }
