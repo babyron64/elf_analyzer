@@ -1,26 +1,30 @@
 CC=gcc
 MAKE=make --no-print-directory
 
-BIN=./bin
+SRC=.
+INC=../include
+BIN=../bin
 
 FLAGS=-I $(INC) -g -O0
 
 OBJS=$(BIN)/main.o $(BIN)/load.o $(BIN)/repl.o $(BIN)/cmd.o
 OBJS+=$(BIN)/elfhdr.o $(BIN)/segment.o $(BIN)/section.o $(BIN)/utils.o
-OBJS+=$(BIN)/section/shstr.o
 
-OUTPUT=./analyelf.out
+HDRS=$(INC)/*
 
 .PHONY: all clean pre
 
-all: pre $(OUTPUT)
+all: $(BIN) pre $(OBJS)
 
 clean:
-	$(MAKE) clean -C ./src
-	rm analyelf.out
+	$(MAKE) clean -C ./section
+	rm $(BIN)/*.o
 
 pre:
-	$(MAKE) -C ./src
+	$(MAKE) -C ./section
 
-$(OUTPUT):
-	$(CC) $(FLAGS) $(OBJS) -o $(OUTPUT)
+$(BIN)/%.o: $(SRC)/%.c $(HDRS) $(BIN)
+	$(CC) $(FLAGS) -c $< -o $@
+
+$(BIN):
+	mkdir -p $(BIN)
