@@ -11,7 +11,7 @@ read_strtbl(char *str, const Elf64_Shdr *ps, Elf64_Half ndx, size_t size) {
     // I haven't implemented error handling and,
     // to avoid using error, I don't implement it now.
     if (ps->sh_type != SHT_STRTAB) {
-        fprintf("The section is not a string table (index: %d)", ndx);
+        fprintf("The section is not a string table\n");
         return -1;
     }
     Elf64_Off offset = ps->sh_offset;
