@@ -29,24 +29,38 @@ release_ptbl() {
     
 const Elf64_Phdr*
 get_phdr(Elf64_Half ndx) {
+    const Elf64_Ehdr *p_ehdr64 = get_ehdr();
+    if (ndx < 0 || ndx >= p_ehdr64->e_phnum)
+        return NULL;
     return &p_ptbl64[ndx];
 }
 
 int
 print_phdr(const Elf64_Phdr *pp) {
     printf("--- PROGRAM HEADER ENTRY ---\n");
-    if (pp == NULL) {
-        printf("No entry exists\n");
-        return -1;
-    }
-    PRINT_STC(pp, p_type, %x);
-    PRINT_STC(pp, p_flags, %x);
-    PRINT_STC(pp, p_offset, %llx);
-    PRINT_STC(pp, p_vaddr, %llx);
-    PRINT_STC(pp, p_paddr, %llx);
-    PRINT_STC(pp, p_filesz, %llx);
-    PRINT_STC(pp, p_memsz, %llx);
-    PRINT_STC(pp, p_align, %llx);
+    PRINT_STC(pp, p_type, %x, h);
+    PRINT_STC(pp, p_flags, %x, h);
+    PRINT_STC(pp, p_offset, %llx, h);
+    PRINT_STC(pp, p_vaddr, %llx, h);
+    PRINT_STC(pp, p_paddr, %llx, h);
+    PRINT_STC(pp, p_filesz, %lld, );
+    PRINT_STC(pp, p_memsz, %lld, );
+    PRINT_STC(pp, p_align, %lld, );
     
+    return 0;
+}
+
+int
+print_seg_dump(const Elf64_Phdr* pp, DUMP_TYPE type) {
+    Elf64_Off offset = pp->p_offset;
+    Elf64_Xword size = pp->p_filesz;
+    switch (type) {
+        case HEX:
+            hex_dump(size, offset);
+            break;
+        case BIN:
+            bin_dump(size, offset);
+            break;
+    }
     return 0;
 }
