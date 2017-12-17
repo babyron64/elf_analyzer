@@ -1,5 +1,4 @@
 CC=gcc
-MAKE=make --no-print-directory
 
 SRC=.
 INC=../../include

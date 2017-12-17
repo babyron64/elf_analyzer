@@ -1,16 +1,16 @@
 CC=gcc
 
 SRC=.
-INC=../include
+INC=../../include
 INC_CMD=$(INC)/cmd
-BIN=../bin
+BIN=../../bin/cmd
 
 FLAGS=-I $(INC) -I $(INC_CMD) -g -O0
 
-OBJS=$(BIN)/main.o $(BIN)/load.o $(BIN)/repl.o $(BIN)/cmd.o
-OBJS+=$(BIN)/elfhdr.o $(BIN)/segment.o $(BIN)/section.o $(BIN)/utils.o
+OBJS=$(BIN)/ehdr_cmd.o $(BIN)/phdr_cmd.o $(BIN)/shdr_cmd.o \
+	 $(BIN)/seg_cmd.o $(BIN)/sec_cmd.o
 
-HDRS=$(INC)/*
+HDRS=$(INC)/* $(INC_CMD)/*
 
 .PHONY: all clean
 

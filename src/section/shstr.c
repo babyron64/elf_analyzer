@@ -1,7 +1,8 @@
 #include <stdio.h>
 
-#include "elf_analyzer.h"
+#include "analy_elf.h"
 #include "analy_sec.h"
+#include "elf_analyzer.h"
 
 static const Elf64_Shdr *p_shstr64;
 

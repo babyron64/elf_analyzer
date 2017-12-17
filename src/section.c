@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <linux/elf.h>
 
-#include "elf_analyzer.h"
+#include "analy_elf.h"
 #include "analy_sec.h"
+#include "elf_analyzer.h"
 
 static Elf64_Shdr *p_stbl64 = NULL;
 
@@ -68,7 +69,7 @@ print_sec_list() {
 }
 
 int
-print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type) {
+print_sec_dump(const Elf64_Shdr* ps, BASE_TYPE type) {
     Elf64_Off offset = ps->sh_offset;
     Elf64_Xword size = ps->sh_size;
     switch (type) {
