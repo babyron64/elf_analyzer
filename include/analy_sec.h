@@ -15,7 +15,10 @@ int print_sec_list();
 int read_sec_name(char *name, const Elf64_Shdr *ps, int size);
 int print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type);
 
-/*** string table section **/
+/*** string table section ***/
+int read_strtbl(char *str, const Elf64_Shdr *ps, Elf64_Half ndx, size_t size);
+
+/*** string table section for section name **/
 int load_shstr();
 const Elf64_Shdr* get_shstr();
 int read_shstr(char *str, Elf64_Half ndx, size_t size);

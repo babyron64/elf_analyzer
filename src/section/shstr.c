@@ -29,7 +29,6 @@ read_shstr(char *str, Elf64_Half ndx, size_t size) {
     // check size+ndx is not larger than p_shstr64->sh_size
     // I haven't implemented error handling and,
     // to avoid using error, I don't implement it now.
-    Elf64_Off p_sstr = p_shstr64->sh_offset;
-    read_elf(str, size, p_sstr+ndx); 
+    read_strtbl(str, p_shstr64, ndx, size);
     return 0;
 }
