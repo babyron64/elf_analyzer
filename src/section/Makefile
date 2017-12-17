@@ -7,7 +7,7 @@ BIN=../../bin/section
 
 FLAGS=-I $(INC) -g -O0
 
-OBJS=$(BIN)/shstr.o
+OBJS=$(BIN)/shstr.o $(BIN)/strtbl.o $(BIN)/symtbl.o $(BIN)/reltbl.o $(BIN)/relatbl.o
 
 HDRS=$(INC)/*
 

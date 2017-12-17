@@ -23,4 +23,16 @@ int load_shstr();
 const Elf64_Shdr* get_shstr();
 int read_shstr(char *str, Elf64_Half ndx, size_t size);
 
+/*** symbol table section ***/
+int read_symtbl(Elf64_Sym *psym, Elf64_Half ndx, const Elf64_Shdr *psh);
+int print_syment(const Elf64_Sym *psym);
+
+/*** rel table section ***/
+int read_reltbl(Elf64_Rel *prel, Elf64_Half ndx, const Elf64_Shdr *psh);
+int print_relent(const Elf64_Rel *prel);
+
+/*** rela table section ***/
+int read_relatbl(Elf64_Rela *prela, Elf64_Half ndx, const Elf64_Shdr *psh);
+int print_relaent(const Elf64_Rela *prela);
+
 #endif
