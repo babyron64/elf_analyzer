@@ -29,10 +29,10 @@ eval(int cmdc, char cmds[][MAX_CMD_LEN]) {
         eval_error("No command input");
         return -1;
     }
-    char *cmd = cmds[0];
     int ix = 0;
+    char *cmd = cmds[ix];
     if (strcmp(cmd, "quit") == 0)
-        return 0;
+        return 1;
     else if (strcmp(cmd, "ehdr") == 0)
         return CMD_CALL(eval_ehdr, cmdc, ix, cmds);
     else if (strcmp(cmd, "phdr") == 0)
