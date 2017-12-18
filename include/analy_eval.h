@@ -6,5 +6,9 @@
 #include "shdr_cmd.h"
 #include "seg_cmd.h"
 #include "sec_cmd.h"
+#include "str_cmd.h"
+#include "sym_cmd.h"
+#include "rel_cmd.h"
+#include "rela_cmd.h"
 
 #endif
