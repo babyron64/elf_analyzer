@@ -14,7 +14,7 @@ parse_line(char cmds[][MAX_CMD_LEN], char *inputs) {
     char *p = strtok(inputs, " ");
     int i = 0;
     while (1) {
-        if (p == NULL || i == MAX_TOK_NUM)
+        if (p == NULL)
             break;
         for (char *q=p; *q!='\0'; q++) if (*q=='\n') *q='\0';
         if (*p != '\0')

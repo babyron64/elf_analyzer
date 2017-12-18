@@ -25,6 +25,10 @@ loop() {
         printf("(elf_analyzer) ");
         fgets(line, 128, stdin);
         cmdc = parse_line(cmds, line);
+        if (cmdc > MAX_TOK_NUM) {
+            fprintf(stderr, "Too many commands");
+            continue;
+        }
         res = eval(cmdc, cmds);
         if (res == 1)
             break;
