@@ -7,6 +7,26 @@ cd elf_analyzer
 make
 ```
 
+# Usage
+This analyzer works in two modes: single evaluation mode and multiple evaluation mode. For such a use as utilities in another program, you can use single evaluation mode. On the other hand, for manual analysis, you can use multiple evaluation mode.
+
+## Single evaluation mode
+Execute `elf_analyzer.out` with a file to analyze and arguments that indicate a command to evaluate:
+```
+./elf_analyzer.out <filename> <command>
+```
+The commands available in default are shown later.
+
+## Multiple evaluation mode
+Execute `elf_analyzer.out` only with a file name:
+```
+./elf_analyzer.out <filename>
+```
+This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a command and the analyzer evaluate it:
+```
+(elf_analyzer) <command>
+```
+
 # Command list
 ## header
 ### elf header
