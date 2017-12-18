@@ -44,6 +44,14 @@ eval(int cmdc, char cmds[][MAX_CMD_LEN]) {
         return CMD_CALL(eval_seg, cmdc, ix, cmds);
     else if (strcmp(cmd, "sec") == 0)
         return CMD_CALL(eval_sec, cmdc, ix, cmds);
+    else if (strcmp(cmd, "sym") == 0)
+        return CMD_CALL(eval_sym, cmdc, ix, cmds);
+    else if (strcmp(cmd, "str") == 0)
+        return CMD_CALL(eval_str, cmdc, ix, cmds);
+    else if (strcmp(cmd, "rel") == 0)
+        return CMD_CALL(eval_rel, cmdc, ix, cmds);
+    else if (strcmp(cmd, "rela") == 0)
+        return CMD_CALL(eval_rela, cmdc, ix, cmds);
 
     eval_error("Unknown command");
     return -1;
