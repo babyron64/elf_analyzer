@@ -17,7 +17,8 @@ parse_line(char cmds[][MAX_CMD_LEN], char *inputs) {
         if (p == NULL || i == MAX_TOK_NUM)
             break;
         for (char *q=p; *q!='\0'; q++) if (*q=='\n') *q='\0';
-        strcpy(cmds[i++], p);
+        if (*p != '\0')
+            strcpy(cmds[i++], p);
         p = strtok(NULL, " ");
     }
     return i;
@@ -43,6 +44,8 @@ eval(int cmdc, char cmds[][MAX_CMD_LEN]) {
         return CMD_CALL(eval_seg, cmdc, ix, cmds);
     else if (strcmp(cmd, "sec") == 0)
         return CMD_CALL(eval_sec, cmdc, ix, cmds);
+
+    eval_error("Unknown command");
     return -1;
 }
 

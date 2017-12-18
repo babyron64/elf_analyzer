@@ -19,6 +19,7 @@ eval_phdr(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
     if (strcmp(cmd, "show") == 0)
         return CMD_CALL(eval_phdr_show, cmdc, ix, cmds);
 
+    eval_error("Unknown command");
     return -1;
 }
 

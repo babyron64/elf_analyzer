@@ -22,6 +22,7 @@ eval_seg(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
     if (strcmp(cmd, "dump") == 0)
         return CMD_CALL(eval_seg_dump, cmdc, ix,cmds);
 
+    eval_error("Unknown command");
     return -1;
 }
 

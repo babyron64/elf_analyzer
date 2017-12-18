@@ -22,6 +22,7 @@ eval_sec(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
     if (strcmp(cmd, "dump") == 0)
         return CMD_CALL(eval_sec_dump, cmdc, ix, cmds);
 
+    eval_error("Unknown command");
     return -1;
 }
 
