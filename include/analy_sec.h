@@ -13,7 +13,7 @@ int print_shdr(const Elf64_Shdr *ps);
 int print_sec_list();
 
 int read_sec_name(char *name, const Elf64_Shdr *ps, int size);
-int print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type);
+int print_sec_dump(const Elf64_Shdr* ps, BASE_TYPE type);
 
 /*** string table section ***/
 int read_strtbl(char *str, const Elf64_Shdr *ps, Elf64_Half ndx, size_t size);

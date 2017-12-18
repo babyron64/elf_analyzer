@@ -3,8 +3,13 @@
 #include <string.h>
 #include <linux/elf.h>
 
-#include "elf_analyzer.h"
+#include "analy_elf.h"
+#include "analy_seg.h"
+#include "analy_sec.h"
 #include "analy_ctrl.h"
+#include "analy_utils.h"
+#include "analy_cmd.h"
+#include "elf_analyzer.h"
 
 int
 load() {
@@ -44,7 +49,7 @@ main(int argc, char* argv[]) {
         char cmds[MAX_TOK_NUM][MAX_CMD_LEN] = {{0}};
         for (int i=0; i<argc-2; i++)
             strcpy(cmds[i], argv[i+2]); 
-        eval(cmds);
+        eval(argc-2, cmds);
     }
 
     release();

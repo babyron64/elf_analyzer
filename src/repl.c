@@ -7,7 +7,6 @@
 #include "elf_analyzer.h"
 
 static int loop();
-static int parse_line(char cmds[][MAX_CMD_LEN], char *line);
 static int print_info();
 
 int
@@ -22,30 +21,13 @@ loop() {
 
     while (1) {
         char cmds[MAX_TOK_NUM][MAX_CMD_LEN] = {{0}};
-        int res;
+        int cmdc, res;
         printf("(elf_analyzer) ");
         fgets(line, 128, stdin);
-        parse_line(cmds, line);
-        res = eval(cmds);
+        cmdc = parse_line(cmds, line);
+        res = eval(cmdc, cmds);
         if (res == 1)
             break;
-    }
-
-    return 0;
-}
-
-static int
-parse_line(char cmds[][MAX_CMD_LEN], char *inputs) {
-    char *p = strtok(inputs, " ");
-    Tok tok;
-
-    int i = 0;
-    while (1) {
-        if (p == NULL || i == MAX_TOK_NUM)
-            break;
-        for (char *q=p; *q!='\0'; q++) if (*q=='\n') *q='\0';
-        strcpy(cmds[i++], p);
-        p = strtok(NULL, " ");
     }
 
     return 0;
@@ -54,8 +36,8 @@ parse_line(char cmds[][MAX_CMD_LEN], char *inputs) {
 /*** researved for debug purposes ***/
 static int
 print_info() {
-    const Elf64_Ehdr *p_ehdr64 = get_ehdr();
-    const Elf64_Shdr *p_shstr64 = get_shstr();
+    /** const Elf64_Ehdr *p_ehdr64 = get_ehdr(); */
+    /** const Elf64_Shdr *p_shstr64 = get_shstr(); */
 
     // Your code here
 

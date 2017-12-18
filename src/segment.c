@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <linux/elf.h>
 
-#include "elf_analyzer.h"
+#include "analy_elf.h"
 #include "analy_seg.h"
+#include "elf_analyzer.h"
 
 static Elf64_Phdr *p_ptbl64 = NULL;
 
@@ -51,7 +52,7 @@ print_phdr(const Elf64_Phdr *pp) {
 }
 
 int
-print_seg_dump(const Elf64_Phdr* pp, DUMP_TYPE type) {
+print_seg_dump(const Elf64_Phdr* pp, BASE_TYPE type) {
     Elf64_Off offset = pp->p_offset;
     Elf64_Xword size = pp->p_filesz;
     switch (type) {
