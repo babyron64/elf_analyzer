@@ -37,7 +37,6 @@ This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a 
 - shdr [show index(shdr)]
 ## segment
 ### general
-- seg list
 - seg dump index(phdr) [hex|h|bin|b]
 ## section
 ### general
