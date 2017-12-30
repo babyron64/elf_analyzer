@@ -15,14 +15,14 @@ This analyzer works in two modes: single evaluation mode and multiple evaluation
 ## Single evaluation mode
 Execute `elf_analy` with a file to analyze and arguments that indicate a command to evaluate:
 ```
-./elf_analy <filename> <command>
+elf_analy <filename> <command>
 ```
 The commands available in default are shown later.
 
 ## Multiple evaluation mode
 Execute `elf_analy` only with a file name:
 ```
-./elf_analy <filename>
+elf_analy <filename>
 ```
 This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a command and the analyzer evaluate it:
 ```
