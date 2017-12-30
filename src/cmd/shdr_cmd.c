@@ -20,8 +20,6 @@ eval_shdr(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
     
     if (strcmp(cmd, "show") == 0)
         return CMD_CALL(eval_shdr_show, cmdc, ix, cmds);
-    else if (strcmp(cmd, "list") == 0)
-        return CMD_CALL(eval_shdr_list, cmdc, ix, cmds);
 
     eval_error("Unknown command");
     return -1;
@@ -50,17 +48,6 @@ SHOW: ;
         return -1;
     }
     print_shdr(ps);
-
-    return 0;
-}
-
-static int
-eval_shdr_list(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc > 0) {
-        eval_error("Too many argument");
-        return -1;
-    }
-    print_sec_list();
 
     return 0;
 }

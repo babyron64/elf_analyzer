@@ -10,6 +10,7 @@
 #include "elf_analyzer.h"
 
 static int eval_sec_dump(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+static int eval_sec_list(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
 
 int
 eval_sec(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
@@ -21,6 +22,8 @@ eval_sec(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
     char *cmd = cmds[ix];
     if (strcmp(cmd, "dump") == 0)
         return CMD_CALL(eval_sec_dump, cmdc, ix, cmds);
+    else if (strcmp(cmd, "list") == 0)
+        return CMD_CALL(eval_sec_list, cmdc, ix, cmds);
 
     eval_error("Unknown command");
     return -1;
@@ -58,6 +61,17 @@ DUMP: ;
         return -1;
     }
     print_sec_dump(ps, base);
+
+    return 0;
+}
+
+static int
+eval_sec_list(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
+    if (cmdc > 0) {
+        eval_error("Too many argument");
+        return -1;
+    }
+    print_sec_list();
 
     return 0;
 }
