@@ -11,15 +11,21 @@ OBJS=$(patsubst $(SRC)/%.c, $(BIN)/%.o, $(SRCS))
 
 FLAGS=-I $(INC) -I $(INC)/cmd -g -O0
 
-OUTPUT=./analyelf.out
+OUTPUT=./bin/elf_analy.out
+BIN_INSTALL_PATH=/usr/local/bin/elf_analy
 
-.PHONY: all clean
+.PHONY: all install uninstall clean
 
 all: $(BIN) $(BIN)/section $(BIN)/cmd $(OUTPUT)
 
+install:
+	cp $(OUTPUT) $(BIN_INSTALL_PATH)
+
+uninstall:
+	rm $(BIN_INSTALL_PATH)
+
 clean:
 	rm -rf $(BIN)/*
-	rm analyelf.out
 
 $(OUTPUT): $(OBJS)
 	$(CC) $(FLAGS) $(OBJS) -o $(OUTPUT)
