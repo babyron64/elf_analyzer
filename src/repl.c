@@ -26,7 +26,7 @@ loop() {
         fgets(line, 128, stdin);
         cmdc = parse_line(cmds, line);
         if (cmdc > MAX_TOK_NUM) {
-            fprintf(stderr, "Too many commands");
+            fprintf(stderr, "Too many commands\n");
             continue;
         }
         res = eval(cmdc, cmds);
