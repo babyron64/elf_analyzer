@@ -9,7 +9,8 @@ SRCS=$(wildcard $(SRC)/*.c) $(wildcard $(SRC)/section/*.c) $(wildcard $(SRC)/cmd
 HDRS=$(wildcard $(INC)/*.h) $(wildcard $(INC)/cmd/*.h)
 OBJS=$(patsubst $(SRC)/%.c, $(BIN)/%.o, $(SRCS))
 
-FLAGS=-I $(INC) -I $(INC)/cmd -g -O0
+DEBUGS=-g -O0
+FLAGS=-I $(INC) -I $(INC)/cmd -Wall $(DEBUGS)
 
 OUTPUT=./bin/elf_analy.out
 BIN_INSTALL_PATH=/usr/local/bin/elf_analy
