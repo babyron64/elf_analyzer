@@ -9,8 +9,7 @@ static int hex_byte2char(char *buf, const unsigned char byte) ;
 static char hex_half2char(const unsigned char half);
 static int bin_byte2char(char *buf, const unsigned char byte) ;
 static char bin_bit2char(const unsigned char bit);
-static int char_dump(size_t size, const unsigned char* const bins);
-static char char_byte2char(const unsigned char byte);
+static char asc_byte2char(const unsigned char byte);
 
 int
 hex_dump(size_t size, Elf64_Addr offset) {
@@ -18,7 +17,7 @@ hex_dump(size_t size, Elf64_Addr offset) {
         printf("No content exists\n");
         return 0;
     }
-    printf("size: %lubyte\n", size); print_sep();
+    printf("(hex) %lubyte\n", size); print_sep();
     unsigned char *bins = (unsigned char *)load_elf(size, offset);
     unsigned char *pb = bins;
     /**
@@ -32,10 +31,6 @@ hex_dump(size_t size, Elf64_Addr offset) {
         printf("%s", str);
     }
     printf("\n");
-
-    print_sep();
-
-    char_dump(size, bins);
 
     FREE_IF_EXIST(bins);
     return 0;
@@ -64,7 +59,7 @@ bin_dump(size_t size, Elf64_Addr offset) {
         printf("No content exists\n");
         return 0;
     }
-    printf("size: %lubyte\n", size); print_sep();
+    printf("(bin) %lubyte\n", size); print_sep();
     unsigned char *bins = (unsigned char *)load_elf(size, offset);
     unsigned char *pb = bins;
     /**
@@ -78,10 +73,6 @@ bin_dump(size_t size, Elf64_Addr offset) {
         printf("%s", str);
     }
     printf("\n");
-
-    print_sep();
-
-    char_dump(size, bins);
 
     FREE_IF_EXIST(bins);
     return 0;
@@ -106,17 +97,29 @@ bin_bit2char(const unsigned char bit) {
     return (char)(bit+48);
 }
 
-static int
-char_dump(size_t size, const unsigned char* const bins) {
-    const unsigned char *pb = bins;
-    for (int i=0; i<size; i++,pb++)
-        printf("%c", char_byte2char(*pb));
+int
+asc_dump(size_t size, Elf64_Addr offset) {
+    if (size == 0) {
+        printf("No content exists\n");
+        return 0;
+    }
+    printf("(ascii) %lubyte\n", size); print_sep();
+    unsigned char *bins = (unsigned char *)load_elf(size, offset);
+    unsigned char *pb = bins;
+    /**
+     * asc=****\n
+     ***/
+    for (int i=0; i<size; i++, pb++) {
+        printf("%c", asc_byte2char(*pb));
+    }
     printf("\n");
+
+    FREE_IF_EXIST(bins);
     return 0;
 }
 
 static char
-char_byte2char(const unsigned char byte) {
+asc_byte2char(const unsigned char byte) {
     if (33 <= byte && byte <= 126)
         return (char)byte;
     else

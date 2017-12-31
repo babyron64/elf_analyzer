@@ -11,6 +11,8 @@
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
 
+#define LINE_BUF_LEN 128
+
 int
 load() {
     load_ehdr();
@@ -41,15 +43,29 @@ main(int argc, char* argv[]) {
     }
 
     load();
+    parser_init();
+
     if (argc == 2)
         repl();
     else {
         if (argc-2 > MAX_TOK_NUM)
             fprintf(stderr, "Too many arguments\n");
-        char cmds[MAX_TOK_NUM][MAX_CMD_LEN] = {{0}};
-        for (int i=0; i<argc-2; i++)
-            strcpy(cmds[i], argv[i+2]); 
-        eval(argc-2, cmds);
+
+        char line[LINE_BUF_LEN];
+        int ix = 0;
+        for (int i=2; i< argc; i++) {
+            for (char *ptr = argv[i]; *ptr != '\0' && ix < LINE_BUF_LEN-1; ptr++)
+                line[ix++] = *ptr; 
+            line[ix++] = ' ';
+        }
+        while (ix < LINE_BUF_LEN)
+            line[ix++] = '\0';
+        line[LINE_BUF_LEN-1] = '\0';
+
+        char **cmds;
+        cmds = parse_line(line);
+        if (cmds == NULL) return -1;
+        eval(cmds);
     }
 
     release();

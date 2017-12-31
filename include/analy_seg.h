@@ -10,6 +10,6 @@ int release_ptbl();
 
 const Elf64_Phdr* get_phdr(Elf64_Half ndx);
 int print_phdr(const Elf64_Phdr *pp);
-int print_seg_dump(const Elf64_Phdr* pp, BASE_TYPE type);
+int print_seg_dump(const Elf64_Phdr* pp, DUMP_TYPE type);
 
 #endif

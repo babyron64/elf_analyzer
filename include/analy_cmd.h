@@ -4,11 +4,23 @@
 #define MAX_CMD_LEN 8
 #define MAX_TOK_NUM 8
 
-#define CMD_CALL(cmd, cmdc, ix, cmds) \
-    (cmdc)-1 > 0?cmd((cmdc)-1, (ix)+1, cmds):cmd(0, 0, NULL)
+#define IS_TOK(val, tok) \
+    strcmp(val, #tok) == 0
 
-int eval(int cmdc, char cmds[][MAX_CMD_LEN]);
-int parse_line(char cmds[][MAX_CMD_LEN], char *line);
+typedef enum {
+    NORMAL = 0,
+    QUIT,
+    CD,
+    ROOT
+} CTRL_CMD;
+
+
+int eval(char **cmds);
 int eval_error(char *mes);
+CTRL_CMD get_ctrl_type(char *cmd);
+
+int parser_init();
+char** parse_line(char *line);
+int save_prefix(char **pf);
 
 #endif

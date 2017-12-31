@@ -4,50 +4,41 @@
 #include <linux/elf.h>
 
 #include "ehdr_cmd.h"
+#include "utils_cmd.h"
 #include "analy_sec.h"
 #include "analy_elf.h"
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
 
-static int eval_str_show(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
-static int eval_str_read(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+static int eval_str_show(char **cmds);
+static int eval_str_read(char **cmds);
 
 int
-eval_str(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc == 0) {
+eval_str(char **cmds) {
+    if (is_last_cmd(cmds)) {
         eval_error("Unknown command");
         return -1;
     }
 
-    char *cmd = cmds[ix];
-    
-    if (strcmp(cmd, "show") == 0)
-        return CMD_CALL(eval_str_show, cmdc, ix, cmds);
-    else if (strcmp(cmd, "read") == 0)
-        return CMD_CALL(eval_str_read, cmdc, ix, cmds);
+    char *cmd = cmds[0];
+    cmds++;
+    if (IS_TOK(cmd, show))
+        return eval_str_show(cmds);
+    else if (IS_TOK(cmd, read))
+        return eval_str_read(cmds);
 
     eval_error("Unknown command");
     return -1;
 }
 
 static int
-eval_str_show(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
+eval_str_show(char **cmds) {
     int ndx = 0;
-    int str_ndx = 0;
-    if (cmdc == 0) {
-        eval_error("Too few argument");
-        return -1;
-    }
 
-    char *cmd = cmds[ix];
-    if (strcmp(cmd, "0") == 0) goto SHOW;
-    ndx = atoi(cmd);
-    if (ndx == 0) {
-        eval_error("Illegal argument");
-        return -1;
-    }
+    ndx = eval_ndx(cmds);
+    if (ndx == -1) return -1;
+    cmds++;
 
-SHOW: ;
     const Elf64_Shdr *ps = get_shdr(ndx);
     if (ps == NULL) {
         eval_error("No such an entry");
@@ -82,41 +73,29 @@ SHOW: ;
                 goto END;
         }
     }
-END: ;
 
+END: ;
     FREE_IF_EXIST(buf);
     return 0;
 }
 
 static int
-eval_str_read(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
+eval_str_read(char **cmds) {
     int ndx = 0;
     int str_ndx = 0;
-    if (cmdc == 0) {
-        eval_error("Too few argument");
+
+    ndx = eval_ndx(cmds);
+    if (ndx == -1) return -1;
+    cmds++;
+
+    str_ndx = eval_ndx(cmds);
+    if (str_ndx == -1) return -1;
+    cmds++;
+
+    if (! is_last_cmd(cmds)) {
+        eval_error("Too many argument");
         return -1;
     }
-
-NDX: ;
-    char *cmd = cmds[ix];
-    if (strcmp(cmd, "0") == 0) goto STR_NDX;
-    ndx = atoi(cmd);
-    if (ndx == 0) {
-        eval_error("Illegal argument");
-        return -1;
-    }
-
-STR_NDX: ;
-    if (cmdc == 1) goto SHOW;
-    cmd = cmds[ix+1];
-    if (strcmp(cmd, "0") == 0) goto STR_NDX;
-    str_ndx = atoi(cmd);
-    if (str_ndx == 0) {
-        eval_error("Illegal argument");
-        return -1;
-    }
-
-SHOW: ;
     const Elf64_Shdr *ps = get_shdr(ndx);
     if (ps == NULL) {
         eval_error("No such an entry");

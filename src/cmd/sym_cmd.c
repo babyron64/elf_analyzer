@@ -4,47 +4,41 @@
 #include <linux/elf.h>
 
 #include "ehdr_cmd.h"
+#include "utils_cmd.h"
 #include "analy_sec.h"
 #include "analy_elf.h"
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
 
-static int eval_sym_show(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+static int eval_sym_show(char **cmds);
 
 int
-eval_sym(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc == 0)
-        return CMD_CALL(eval_sym_show, cmdc, ix, cmds);
+eval_sym(char **cmds) {
+    if (is_last_cmd(cmds))
+        return eval_sym_show(cmds);
 
-    char *cmd = cmds[ix];
+    char *cmd = cmds[0];
+    cmds++;
     
-    if (strcmp(cmd, "show") == 0)
-        return CMD_CALL(eval_sym_show, cmdc, ix, cmds);
+    if (IS_TOK(cmd, show))
+        return eval_sym_show(cmds);
 
     eval_error("Unknown command");
     return -1;
 }
 
 static int
-eval_sym_show(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
+eval_sym_show(char **cmds) {
     int ndx = 0;
-    if (cmdc == 0) {
-        eval_error("Unknown command");
-        return -1;
-    }
-    if (cmdc != 1) {
+
+    ndx = eval_ndx(cmds);
+    if (ndx == -1) return -1;
+    cmds++;
+
+    if (is_last_cmd(cmds)) {
         eval_error("Too many arguments");
         return -1;
     }
-    char *cmd = cmds[ix];
-    if (strcmp(cmd, "0") == 0) goto SHOW;
-    ndx = atoi(cmd);
-    if (ndx == 0) {
-        eval_error("Illegal argument");
-        return -1;
-    }
-
-SHOW: ;
     const Elf64_Shdr *ps = get_shdr(ndx);
     if (ps == NULL) {
         eval_error("No such an entry");
