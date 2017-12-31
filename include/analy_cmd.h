@@ -7,11 +7,20 @@
 #define IS_TOK(val, tok) \
     strcmp(val, #tok) == 0
 
+typedef enum {
+    NORMAL = 0,
+    QUIT,
+    CD,
+    ROOT
+} CTRL_CMD;
+
+
 int eval(char **cmds);
-char** parse_line(char *line);
 int eval_error(char *mes);
+CTRL_CMD get_ctrl_type(char *cmd);
 
 int parser_init();
-int release_cmdbase();
+char** parse_line(char *line);
+int save_prefix(char **pf);
 
 #endif

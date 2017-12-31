@@ -23,6 +23,7 @@
  * see the comment in src/cmd/ehdr_cmd.c file for the
  * other things you have to do.
  ***/
+#include "debug.h"
 int
 eval(char **cmds) {
     if (cmds[0][0] == '\0') {
@@ -33,6 +34,10 @@ eval(char **cmds) {
     cmds++;
     if (IS_TOK(cmd, quit))
         return 1;
+    else if (IS_TOK(cmd, cd))
+        return save_prefix(cmds);
+    else if (IS_TOK(cmd, /))
+        return eval(cmds);
     else if (IS_TOK(cmd, ehdr))
         return eval_ehdr(cmds);
     else if (IS_TOK(cmd, phdr))
@@ -60,4 +65,15 @@ int
 eval_error(char *mes) {
     fprintf(stderr, "%s\n", mes);
     return 0;
+}
+
+CTRL_CMD
+get_ctrl_type(char *cmd) {
+    if (IS_TOK(cmd, quit))
+        return QUIT;
+    else if (IS_TOK(cmd, cd))
+        return CD;
+    else if (IS_TOK(cmd, /))
+        return ROOT;
+    return NORMAL;
 }

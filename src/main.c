@@ -64,6 +64,7 @@ main(int argc, char* argv[]) {
 
         char **cmds;
         cmds = parse_line(line);
+        if (cmds == NULL) return -1;
         eval(cmds);
     }
 

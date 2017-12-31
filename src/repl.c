@@ -31,6 +31,7 @@ loop() {
         printf("(elf_analyzer) ");
         fgets(line, 128, stdin);
         cmds = parse_line(line);
+        if (cmds == NULL) continue;
         res = eval(cmds);
         if (res == 1)
             break;
