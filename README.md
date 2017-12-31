@@ -39,11 +39,11 @@ This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a 
 - shdr [show index(shdr)]
 ## segment
 ### general
-- seg dump index(phdr) [hex|h|bin|b]
+- seg dump index(phdr) [hex|h|bin|b|ascii|asc|a]
 ## section
 ### general
 - sec list
-- sec dump index(shdr) [hex|h|bin|b]
+- sec dump index(shdr) [hex|h|bin|b|ascii|asc|a]
 ### string table
 - str show index(shdr)
 - str read index(shdr) index(strtbl)
@@ -56,8 +56,9 @@ This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a 
 
 ---
 - index(***): index of the entry in *** table(tbl)
-- `hex` is equivalent to `h`
-- `bin` is equivalent to `b`
+- `h` is equivalent to `hex`
+- `b` is equivalent to `bin`
+- `a` is equivalent to `asc` and `ascii`
 
 # Add your own command
 Add your code and header file to `elf_analyzer/src/cmd` and `elf_analyzer/include/cmd` respectively. The header file must be specified in `elf_analyzer/include/analy_eval.h` file, and the "root-function" (ie. eval_(feature)) in `elf_analyzer/src/eval.c`. Following the existing commands' formats, describe your own command's specification in these files. Your code must expose the root-function to the global scope, so that it will be accessible for the compiler. The name of the command should follow the convention: eval_(feature)\_(sub-feature)_...
