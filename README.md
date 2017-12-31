@@ -61,4 +61,5 @@ This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a 
 - `a` is equivalent to `asc` and `ascii`
 
 # Add your own command
-Add your code and header file to `elf_analyzer/src/cmd` and `elf_analyzer/include/cmd` respectively. The header file must be specified in `elf_analyzer/include/analy_eval.h` file, and the "root-function" (ie. eval_(feature)) in `elf_analyzer/src/eval.c`. Following the existing commands' formats, describe your own command's specification in these files. Your code must expose the root-function to the global scope, so that it will be accessible for the compiler. The name of the command should follow the convention: eval_(feature)\_(sub-feature)_...
+Add your code and header file to `elf_analyzer/src/cmd` and `elf_analyzer/include/cmd` respectively. The header file must be specified in `elf_analyzer/include/analy_eval.h` file, and the "root-function" (ie. eval_(feature)) in `elf_analyzer/src/eval.c`. Following the existing commands' formats, describe your own command's specification in these files. Your code must expose the root-function to the global scope, so that it will be accessible for the compiler. The name of the command should follow the convention: eval_(feature)\_(sub-feature)\_...
+See the comments in src/cmd.c and src/cmd/ehdr_cmd.c files for more detailes.
