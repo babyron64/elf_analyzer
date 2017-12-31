@@ -52,7 +52,7 @@ print_phdr(const Elf64_Phdr *pp) {
 }
 
 int
-print_seg_dump(const Elf64_Phdr* pp, BASE_TYPE type) {
+print_seg_dump(const Elf64_Phdr* pp, DUMP_TYPE type) {
     Elf64_Off offset = pp->p_offset;
     Elf64_Xword size = pp->p_filesz;
     switch (type) {
@@ -61,6 +61,9 @@ print_seg_dump(const Elf64_Phdr* pp, BASE_TYPE type) {
             break;
         case BIN:
             bin_dump(size, offset);
+            break;
+        case ASC:
+            asc_dump(size, offset);
             break;
     }
     return 0;

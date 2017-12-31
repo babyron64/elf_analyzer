@@ -69,7 +69,7 @@ print_sec_list() {
 }
 
 int
-print_sec_dump(const Elf64_Shdr* ps, BASE_TYPE type) {
+print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type) {
     Elf64_Off offset = ps->sh_offset;
     Elf64_Xword size = ps->sh_size;
     switch (type) {
@@ -79,6 +79,8 @@ print_sec_dump(const Elf64_Shdr* ps, BASE_TYPE type) {
         case BIN:
             bin_dump(size, offset);
             break;
+        case ASC:
+            asc_dump(size, offset);
     }
     return 0;
 }
