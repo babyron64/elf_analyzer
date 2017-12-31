@@ -81,6 +81,10 @@ print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type) {
             break;
         case ASC:
             asc_dump(size, offset);
+            break;
+        default:
+            fprintf(stderr, "Illegal dump type\n");
+            break;
     }
     return 0;
 }

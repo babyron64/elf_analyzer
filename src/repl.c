@@ -7,7 +7,13 @@
 #include "elf_analyzer.h"
 
 static int loop();
+/*** researved for debug purposes
+ * Uncomment the following line to use it.
+ ***/
+/** #define DEBUG_PRINT **/
+#ifdef DEBUG_PRINT
 static int print_info();
+#endif
 
 int
 repl() {
@@ -20,16 +26,12 @@ loop() {
     char line[128];
 
     while (1) {
-        char cmds[MAX_TOK_NUM][MAX_CMD_LEN] = {{0}};
-        int cmdc, res;
+        char **cmds;
+        int res;
         printf("(elf_analyzer) ");
         fgets(line, 128, stdin);
-        cmdc = parse_line(cmds, line);
-        if (cmdc > MAX_TOK_NUM) {
-            fprintf(stderr, "Too many commands\n");
-            continue;
-        }
-        res = eval(cmdc, cmds);
+        cmds = parse_line(line);
+        res = eval(cmds);
         if (res == 1)
             break;
     }
@@ -37,7 +39,7 @@ loop() {
     return 0;
 }
 
-/*** researved for debug purposes ***/
+#ifdef DEBUG_PRINT
 static int
 print_info() {
     /** const Elf64_Ehdr *p_ehdr64 = get_ehdr(); */
@@ -47,3 +49,4 @@ print_info() {
 
     return 0;
 }
+#endif

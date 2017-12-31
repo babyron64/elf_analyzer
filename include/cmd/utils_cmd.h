@@ -4,7 +4,8 @@
 #include "analy_cmd.h"
 #include "analy_utils.h"
 
-int eval_ndx(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
-DUMP_TYPE eval_dump_type(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+int eval_ndx(char **cmds);
+DUMP_TYPE eval_dump_type(char **cmds);
+int is_last_cmd(char **cmds);
 
 #endif

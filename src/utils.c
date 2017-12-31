@@ -109,7 +109,6 @@ asc_dump(size_t size, Elf64_Addr offset) {
     /**
      * asc=****\n
      ***/
-    char str[8];
     for (int i=0; i<size; i++, pb++) {
         printf("%c", asc_byte2char(*pb));
     }

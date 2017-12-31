@@ -3,6 +3,6 @@
 
 #include "analy_cmd.h"
 
-int eval_seg(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+int eval_seg(char **cmds);
 
 #endif

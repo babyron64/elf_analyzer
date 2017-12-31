@@ -7,10 +7,14 @@
 #include "analy_utils.h"
 
 int
-eval_ndx(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    char *cmd = cmds[ix];
+eval_ndx(char **cmds) {
+    if (is_last_cmd(cmds)) {
+        eval_error("Too few argument");
+        return -1;
+    }
+    char *cmd = cmds[0];
     int ndx = atoi(cmd);
-    if (strcmp(cmd, "0") == 0) return 0;
+    if (IS_TOK(cmd, 0)) return 0;
     if (ndx <= 0) {
         eval_error("Illegal argument");
         return -1;
@@ -19,17 +23,25 @@ eval_ndx(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
 }
 
 DUMP_TYPE
-eval_dump_type(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc == 0) return HEX;
-    char *cmd = cmds[ix];
-    if (strcmp(cmd, "h") == 0 || strcmp(cmd, "hex") == 0)
+eval_dump_type(char **cmds) {
+    if (is_last_cmd(cmds)) {
+        eval_error("Too few argument");
+        return NA_DUMP_TYPE;
+    }
+    char *cmd = cmds[0];
+    if (IS_TOK(cmd, h) || IS_TOK(cmd, hex))
         return HEX;
-    else if (strcmp(cmd, "b") == 0 || strcmp(cmd, "bin") == 0)
+    else if (IS_TOK(cmd, b) || IS_TOK(cmd, bin))
         return BIN;
-    else if (strcmp(cmd, "a") == 0 || strcmp(cmd, "asc") == 0 || strcmp(cmd, "ascii") == 0)
+    else if (IS_TOK(cmd, a) || IS_TOK(cmd, asc) || IS_TOK(cmd, ascii))
         return ASC;
     else {
         eval_error("Illegal argument");
         return NA_DUMP_TYPE;
     }
+}
+
+int
+is_last_cmd(char **cmds) {
+    return cmds[0][0] == '\0';
 }

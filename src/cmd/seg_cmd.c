@@ -3,51 +3,49 @@
 #include <string.h>
 #include <linux/elf.h>
 
-#include "utils_cmd.h"
 #include "seg_cmd.h"
+#include "utils_cmd.h"
 #include "analy_seg.h"
 #include "analy_cmd.h"
 #include "analy_utils.h"
 #include "elf_analyzer.h"
 
-static int eval_seg_dump(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+static int eval_seg_dump(char **cmds);
 
 int
-eval_seg(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc == 0) {
+eval_seg(char **cmds) {
+    if (is_last_cmd(cmds)) {
         eval_error("Too few argument");
         return -1;
     }
 
-    char *cmd = cmds[ix];
-    if (strcmp(cmd, "dump") == 0)
-        return CMD_CALL(eval_seg_dump, cmdc, ix,cmds);
+    char *cmd = cmds[0];
+    cmds++;
+    if (IS_TOK(cmd, dump))
+        return eval_seg_dump(cmds);
 
     eval_error("Unknown command");
     return -1;
 }
 
 static int
-eval_seg_dump(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
+eval_seg_dump(char **cmds) {
     int ndx = 0;
-    if (cmdc == 0) {
-        eval_error("Too few argument");
-        return -1;
-    }
-    if (cmdc > 2) {
+    ndx = eval_ndx(cmds);
+    if (ndx == -1) return -1;
+    cmds++;
+
+    DUMP_TYPE type = HEX;
+    if (is_last_cmd(cmds)) goto DUMP;
+    type = eval_dump_type(cmds);
+    if (type == NA_DUMP_TYPE) return -1;
+    cmds++;
+
+DUMP: ;
+    if (! is_last_cmd(cmds)) {
         eval_error("Too many argument");
         return -1;
     }
-    ndx = eval_ndx(cmdc--, ix++, cmds);
-    if (ndx == -1) return -1;
-
-BASE: ;
-    DUMP_TYPE type = HEX;
-    if (cmdc == 0) goto DUMP;
-    type = eval_dump_type(cmdc--, ix++, cmds);
-    if (type == NA_DUMP_TYPE) return -1;
-
-DUMP: ;
     const Elf64_Phdr *pp = get_phdr(ndx);
     if (pp == NULL) {
         eval_error("No such an entry");

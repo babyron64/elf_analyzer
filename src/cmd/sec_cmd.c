@@ -3,54 +3,52 @@
 #include <string.h>
 #include <linux/elf.h>
 
-#include "utils_cmd.h"
 #include "sec_cmd.h"
+#include "utils_cmd.h"
 #include "analy_sec.h"
 #include "analy_cmd.h"
 #include "analy_utils.h"
 #include "elf_analyzer.h"
 
-static int eval_sec_dump(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
-static int eval_sec_list(int cmdc, int ix, char cmds[][MAX_CMD_LEN]);
+static int eval_sec_dump(char **cmds);
+static int eval_sec_list(char **cmds);
 
 int
-eval_sec(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc == 0) {
+eval_sec(char **cmds) {
+    if (is_last_cmd(cmds)) {
         eval_error("Too few argument");
         return -1;
     }
 
-    char *cmd = cmds[ix];
-    if (strcmp(cmd, "dump") == 0)
-        return CMD_CALL(eval_sec_dump, cmdc, ix, cmds);
-    else if (strcmp(cmd, "list") == 0)
-        return CMD_CALL(eval_sec_list, cmdc, ix, cmds);
+    char *cmd = cmds[0];
+    cmds++;
+    if (IS_TOK(cmd, dump))
+        return eval_sec_dump(cmds);
+    else if (IS_TOK(cmd, list))
+        return eval_sec_list(cmds);
 
     eval_error("Unknown command");
     return -1;
 }
 
 static int
-eval_sec_dump(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
+eval_sec_dump(char **cmds) {
     int ndx = 0;
-    if (cmdc == 0) {
-        eval_error("Too few argument");
-        return -1;
-    }
-    if (cmdc > 2) {
+    ndx = eval_ndx(cmds);
+    if (ndx == -1) return -1;
+    cmds++;
+
+    DUMP_TYPE type = HEX;
+    if (is_last_cmd(cmds)) goto DUMP;
+    type = eval_dump_type(cmds);
+    if (type == NA_DUMP_TYPE) return -1;
+    cmds++;
+
+DUMP: ;
+    if (! is_last_cmd(cmds)) {
         eval_error("Too many argument");
         return -1;
     }
-    ndx = eval_ndx(cmdc--, ix++, cmds);
-    if (ndx == -1) return -1;
-
-BASE: ;
-    DUMP_TYPE type = HEX;
-    if (cmdc == 0) goto DUMP;
-    type = eval_dump_type(cmdc--, ix++, cmds);
-    if (type == NA_DUMP_TYPE) return -1;
-
-DUMP: ;
     const Elf64_Shdr *ps = get_shdr(ndx);
     if (ps == NULL) {
         eval_error("No such an entry");
@@ -62,8 +60,8 @@ DUMP: ;
 }
 
 static int
-eval_sec_list(int cmdc, int ix, char cmds[][MAX_CMD_LEN]) {
-    if (cmdc > 0) {
+eval_sec_list(char **cmds) {
+    if (! is_last_cmd(cmds)) {
         eval_error("Too many argument");
         return -1;
     }
