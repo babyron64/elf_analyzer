@@ -56,6 +56,8 @@ eval(char **cmds) {
         return eval_rel(cmds);
     else if (IS_TOK(cmd, rela))
         return eval_rela(cmds);
+    else if (IS_TOK(cmd, dyn))
+        return eval_dyn(cmds);
 
     eval_error("Unknown command");
     return -1;
