@@ -19,8 +19,12 @@ read_dyntbl(Elf64_Dyn *pdyn, Elf64_Half ndx, const Elf64_Shdr *psh) {
 int
 print_dynent(const Elf64_Dyn *pdyn) {
     printf("--- DYNAMIC LINKAGE INFO TABLE ENTRY ---\n");
-    PRINT_STC(pdyn, d_tag, %llx, h);
-    PRINT_STC(pdyn, d_un, %llx, h);
+    char* sni_name;
+    int sni_value = pdyn->d_tag;
+#include "d_tag.sni"
+    PRINT_STC_WITH_NAME(pdyn, d_tag, %lld, d, sni_name);
+    // Pass d_val instead of d_un, which is to be passed if possible, because d_un is a union and can't be displayed by format string %llx, etc..
+    PRINT_STC(pdyn, d_un.d_val, %llx, h);
 
     return 0;
 }
