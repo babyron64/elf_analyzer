@@ -4,10 +4,17 @@ MAKE=make --no-print-directory
 BIN=./bin
 SRC=./src
 INC=./include
+BUILD=./build
 
 SRCS=$(wildcard $(SRC)/*.c) $(wildcard $(SRC)/section/*.c) $(wildcard $(SRC)/cmd/*.c)
-HDRS=$(wildcard $(INC)/*.h) $(wildcard $(INC)/cmd/*.h)
+HDRS=$(wildcard $(INC)/*.h)
 OBJS=$(patsubst $(SRC)/%.c, $(BIN)/%.o, $(SRCS))
+
+SNIP_SRC=$(SRC)/snipets
+SNIP_INC=$(INC)/snipets
+
+SNIP_SRCS=$(wildcard $(SNIP_SRC)/*)
+SNIPS=$(patsubst $(SNIP_SRC)/%, $(SNIP_INC)/%.sni, $(SNIP_SRCS))
 
 DEBUGS=-g -O0
 FLAGS=-I $(INC) -I $(INC)/cmd -Wall $(DEBUGS)
@@ -16,6 +23,7 @@ OUTPUT=./bin/elf_analy.out
 BIN_INSTALL_PATH=/usr/local/bin/elf_analy
 
 .PHONY: all install uninstall clean
+.PRECIOUS: $(SNIPS)
 
 all: $(BIN) $(BIN)/section $(BIN)/cmd $(OUTPUT)
 
@@ -31,8 +39,11 @@ clean:
 $(OUTPUT): $(OBJS)
 	$(CC) $(FLAGS) $(OBJS) -o $(OUTPUT)
 
-$(BIN)/%.o: $(SRC)/%.c $(HDRS)
+$(BIN)/%.o: $(SRC)/%.c $(HDRS) $(SNIPS)
 	$(CC) $(FLAGS) -c $< -o $@
+
+$(SNIP_INC)/%.sni: $(SNIP_SRC)/%
+	python3 $(BUILD)/mkIfElse.py $< $@ value name
 
 $(BIN)/section:
 	mkdir $@
