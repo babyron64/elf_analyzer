@@ -3,8 +3,8 @@
 #include <string.h>
 #include <linux/elf.h>
 
-#include "phdr_cmd.h"
 #include "utils_cmd.h"
+#include "analy_eval.h"
 #include "analy_seg.h"
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
