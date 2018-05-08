@@ -1,15 +1,36 @@
 #ifndef ANALY_EVAL_INCLUDED
 #define ANALY_EVAL_INCLUDED
 
-#include "ehdr_cmd.h"
-#include "phdr_cmd.h"
-#include "shdr_cmd.h"
-#include "seg_cmd.h"
-#include "sec_cmd.h"
-#include "str_cmd.h"
-#include "sym_cmd.h"
-#include "rel_cmd.h"
-#include "rela_cmd.h"
-#include "dyn_cmd.h"
+#include "analy_cmd.h"
+
+/*** ehdr ***/
+int eval_ehdr(char **cmds);
+
+/*** phdr ***/
+int eval_phdr(char **cmds);
+
+/** sec **/
+int eval_sec(char **cmds);
+
+/** seg **/
+int eval_seg(char **cmds);
+
+/** shdr **/
+int eval_shdr(char **cmds);
+
+/** str **/
+int eval_str(char **cmds);
+
+/** sym **/
+int eval_sym(char **cmds);
+
+/** rel **/
+int eval_rel(char **cmds);
+
+/** rela **/
+int eval_rela(char **cmds);
+
+/** dyn **/
+int eval_dyn(char **cmds);
 
 #endif
