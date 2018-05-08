@@ -35,4 +35,8 @@ int print_relent(const Elf64_Rel *prel);
 int read_relatbl(Elf64_Rela *prela, Elf64_Half ndx, const Elf64_Shdr *psh);
 int print_relaent(const Elf64_Rela *prela);
 
+/*** dynamic table section ***/
+int read_dyntbl(Elf64_Dyn *pdyn, Elf64_Half ndx, const Elf64_Shdr *psh);
+int print_dynent(const Elf64_Dyn *pdyn);
+
 #endif

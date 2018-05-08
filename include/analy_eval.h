@@ -10,5 +10,6 @@
 #include "sym_cmd.h"
 #include "rel_cmd.h"
 #include "rela_cmd.h"
+#include "dyn_cmd.h"
 
 #endif
