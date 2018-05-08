@@ -16,6 +16,6 @@ read_strtbl(char *str, const Elf64_Shdr *ps, Elf64_Half ndx, size_t size) {
     }
     Elf64_Off offset = ps->sh_offset;
     read_elf(str, size, offset+ndx); 
-    str[size-1] = "\0";
+    str[size-1] = '\0';
     return 0;
 }
