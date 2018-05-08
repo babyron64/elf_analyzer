@@ -17,13 +17,13 @@ SNIP_SRCS=$(wildcard $(SNIP_SRC)/*)
 SNIPS=$(patsubst $(SNIP_SRC)/%, $(SNIP_INC)/%.sni, $(SNIP_SRCS))
 
 DEBUGS=-g -O0
-FLAGS=-I $(INC) -I $(INC)/cmd -Wall $(DEBUGS)
+FLAGS=-I $(INC) -I $(INC)/cmd -I $(SNIP_INC) -Wall $(DEBUGS)
 
 OUTPUT=./bin/elf_analy.out
 BIN_INSTALL_PATH=/usr/local/bin/elf_analy
 
 .PHONY: all install uninstall clean
-.PRECIOUS: $(SNIPS)
+# .PRECIOUS: $(SNIPS)
 
 all: $(BIN) $(BIN)/section $(BIN)/cmd $(OUTPUT)
 
@@ -43,7 +43,7 @@ $(BIN)/%.o: $(SRC)/%.c $(HDRS) $(SNIPS)
 	$(CC) $(FLAGS) -c $< -o $@
 
 $(SNIP_INC)/%.sni: $(SNIP_SRC)/%
-	python3 $(BUILD)/mkIfElse.py $< $@ value name
+	python3 $(BUILD)/mkIfElse.py $< $@ sni_value sni_name
 
 $(BIN)/section:
 	mkdir $@
