@@ -37,7 +37,7 @@ clean:
 	rm -rf $(BIN)/*
 
 $(OUTPUT): $(OBJS)
-	$(CC) $(FLAGS) $(OBJS) -o $(OUTPUT)
+	$(CC) $(DEBUGS) $(FLAGS) $(OBJS) -o $(OUTPUT)
 
 $(BIN)/%.o: $(SRC)/%.c $(HDRS) $(SNIPS)
 	$(CC) $(FLAGS) -c $< -o $@

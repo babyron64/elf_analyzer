@@ -38,5 +38,6 @@ int print_relaent(const Elf64_Rela *prela);
 /*** dynamic table section ***/
 int read_dyntbl(Elf64_Dyn *pdyn, Elf64_Half ndx, const Elf64_Shdr *psh);
 int print_dynent(const Elf64_Dyn *pdyn);
+int get_d_tag(Elf64_Sxword d_tag, char* buf, size_t size);
 
 #endif
