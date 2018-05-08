@@ -49,7 +49,7 @@ main(int argc, char* argv[]) {
         repl();
     else {
         if (argc-2 > MAX_TOK_NUM)
-            fprintf(stderr, "Too many arguments\n");
+            fprintf(stderr, "Too long command\n");
 
         char line[LINE_BUF_LEN];
         int ix = 0;
