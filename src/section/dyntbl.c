@@ -31,8 +31,8 @@ print_dynent(const Elf64_Dyn *pdyn) {
 
 int
 get_d_tag(Elf64_Sxword d_tag, char* buf, size_t size) {
-    char* sni_name;
-    int sni_value = d_tag;
+    char* sni_name = "(error) unknown DT type";
+    const Elf64_Sxword sni_value = d_tag;
 #include "d_tag.sni"
     strncpy(buf, sni_name, size);
     buf[size-1] = '\0';

@@ -90,7 +90,7 @@ eval_dyn_list(char **cmds){
             continue;
         }
         get_d_tag(pdyn->d_tag, buf, 128);
-        printf("%d %s\n", i, buf);
+        printf("%d\t%s\n", i, buf);
     }
 
     FREE_IF_EXIST(pdyn);
