@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <linux/elf.h>
 
@@ -26,6 +27,24 @@ print_dynent(const Elf64_Dyn *pdyn) {
     // Pass d_val instead of d_un, which is to be passed if possible, because d_un is a union and can't be displayed by format string %llx, etc..
     PRINT_STC(pdyn, d_un.d_val, %llx, h);
 
+    return 0;
+}
+
+int
+print_dyn_list(const Elf64_Shdr *psh) {
+    Elf64_Dyn *pdyn = (Elf64_Dyn *)malloc(psh->sh_entsize);
+    
+    int tbl_len = psh->sh_size / psh->sh_entsize;
+    char buf[128];
+    for (int i=0; i<tbl_len; i++) {
+        if (read_dyntbl(pdyn, i, psh) == -1) {
+            continue;
+        }
+        get_d_tag(pdyn->d_tag, buf, 128);
+        printf("%d\t%s\n", i, buf);
+    }
+
+    FREE_IF_EXIST(pdyn);
     return 0;
 }
 

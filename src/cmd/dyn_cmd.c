@@ -81,18 +81,8 @@ eval_dyn_list(char **cmds){
         eval_error("No such an entry");
         return -1;
     }
-    Elf64_Dyn *pdyn = (Elf64_Dyn *)malloc(ps->sh_entsize);
-    
-    int tbl_len = ps->sh_size / ps->sh_entsize;
-    char buf[128];
-    for (int i=0; i<tbl_len; i++) {
-        if (read_dyntbl(pdyn, i, ps) == -1) {
-            continue;
-        }
-        get_d_tag(pdyn->d_tag, buf, 128);
-        printf("%d\t%s\n", i, buf);
-    }
 
-    FREE_IF_EXIST(pdyn);
+    print_dyn_list(ps);
+
     return 0;
 }
