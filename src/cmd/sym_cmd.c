@@ -30,12 +30,16 @@ eval_sym(char **cmds) {
 static int
 eval_sym_show(char **cmds) {
     int ndx = 0;
+    int sym_ndx = 0;
 
     ndx = eval_ndx(cmds);
     if (ndx == -1) return -1;
     cmds++;
+    sym_ndx = eval_ndx(cmds);
+    if (ndx == -1) return -1;
+    cmds++;
 
-    if (is_last_cmd(cmds)) {
+    if (! is_last_cmd(cmds)) {
         eval_error("Too many arguments");
         return -1;
     }
@@ -45,7 +49,7 @@ eval_sym_show(char **cmds) {
         return -1;
     }
     Elf64_Sym sym;
-    if (read_symtbl(&sym, ndx, ps) == -1)
+    if (read_symtbl(&sym, sym_ndx, ps) == -1)
         return -1;
     print_syment(&sym);
 
