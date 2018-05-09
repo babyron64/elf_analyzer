@@ -10,7 +10,7 @@
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
 
-static int eval_dyn_read(char **cmds);
+static int eval_dyn_show(char **cmds);
 static int eval_dyn_list(char **cmds);
 
 int
@@ -22,8 +22,8 @@ eval_dyn(char **cmds) {
 
     char *cmd = cmds[0];
     cmds++;
-    if (IS_TOK(cmd, read))
-        return eval_dyn_read(cmds);
+    if (IS_TOK(cmd, show))
+        return eval_dyn_show(cmds);
     else if (IS_TOK(cmd, list))
         return eval_dyn_list(cmds);
 
@@ -32,7 +32,7 @@ eval_dyn(char **cmds) {
 }
 
 static int
-eval_dyn_read(char **cmds){
+eval_dyn_show(char **cmds){
     int ndx = 0;
     int dyn_ndx = 0;
 
