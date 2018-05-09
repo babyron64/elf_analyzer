@@ -36,7 +36,7 @@ eval_sym_show(char **cmds) {
     if (ndx == -1) return -1;
     cmds++;
     sym_ndx = eval_ndx(cmds);
-    if (ndx == -1) return -1;
+    if (sym_ndx == -1) return -1;
     cmds++;
 
     if (! is_last_cmd(cmds)) {
