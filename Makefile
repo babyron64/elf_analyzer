@@ -1,5 +1,6 @@
 CC=gcc
 MAKE=make --no-print-directory
+DEBUGS=-g -O0
 
 BIN=./bin
 SRC=./src
@@ -16,7 +17,6 @@ SNIP_INC=$(INC)/snipets
 SNIP_SRCS=$(wildcard $(SNIP_SRC)/*)
 SNIPS=$(patsubst $(SNIP_SRC)/%, $(SNIP_INC)/%.sni, $(SNIP_SRCS))
 
-DEBUGS=-g -O0
 FLAGS=-I $(INC) -I $(INC)/cmd -I $(SNIP_INC) -Wall $(DEBUGS)
 
 OUTPUT=./bin/elf_analy.out
