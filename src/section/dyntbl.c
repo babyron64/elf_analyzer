@@ -32,19 +32,22 @@ print_dynent(const Elf64_Dyn *pdyn) {
 
 int
 print_dyn_list(const Elf64_Shdr *psh) {
-    Elf64_Dyn *pdyn = (Elf64_Dyn *)malloc(psh->sh_entsize);
+    if (psh->sh_type != SHT_DYNAMIC) {
+        fprintf(stderr, "The section is not for dynamic linking\n");
+        return -1;
+    }
+    Elf64_Dyn dyn;
     
     int tbl_len = psh->sh_size / psh->sh_entsize;
     char buf[128];
     for (int i=0; i<tbl_len; i++) {
-        if (read_dyntbl(pdyn, i, psh) == -1) {
+        if (read_dyntbl(&dyn, i, psh) == -1) {
             continue;
         }
-        get_d_tag(pdyn->d_tag, buf, 128);
+        get_d_tag(dyn.d_tag, buf, 128);
         printf("%d\t%s\n", i, buf);
     }
 
-    FREE_IF_EXIST(pdyn);
     return 0;
 }
 
