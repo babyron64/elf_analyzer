@@ -5,7 +5,9 @@
 #include <linux/elf.h>
 
 #define PRINT_STC(ptr, name, format, suffix) \
-    printf( #name ":\t"  #format #suffix "\n", ptr -> name )
+    printf( #name ":\t"  #format #suffix "\n", (ptr) -> name )
+#define PRINT_STC_WITH_NAME(ptr, name, format, suffix, val_name) \
+    printf( #name ":\t%s ("  #format #suffix ")\n", val_name, (ptr) -> name)
 
 #define FREE_IF_EXIST(ptr) \
     if ((ptr) != NULL) free(ptr)

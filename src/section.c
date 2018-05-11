@@ -38,8 +38,10 @@ get_shdr(Elf64_Half ndx) {
 
 int
 print_shdr(const Elf64_Shdr *ps) {
+    char buf[16];
     printf("--- SECTION HEADER ENTRY ---\n");
-    PRINT_STC(ps, sh_name, %x, h);
+    read_sec_name(buf, ps, 16);
+    PRINT_STC_WITH_NAME(ps, sh_name, %x, h, buf);
     PRINT_STC(ps, sh_type, %x, h);
     PRINT_STC(ps, sh_flags, %llx, h);
     PRINT_STC(ps, sh_addr, %llx, h);
@@ -88,7 +90,6 @@ print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type) {
     }
     return 0;
 }
-
 
 int
 read_sec_name(char *name, const Elf64_Shdr *ps, int size) {

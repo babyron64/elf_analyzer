@@ -25,7 +25,8 @@ int read_shstr(char *str, Elf64_Half ndx, size_t size);
 
 /*** symbol table section ***/
 int read_symtbl(Elf64_Sym *psym, Elf64_Half ndx, const Elf64_Shdr *psh);
-int print_syment(const Elf64_Sym *psym);
+int print_syment(const Elf64_Shdr *psh, int ndx);
+int print_sym_list(const Elf64_Shdr* psh);
 
 /*** rel table section ***/
 int read_reltbl(Elf64_Rel *prel, Elf64_Half ndx, const Elf64_Shdr *psh);
@@ -38,5 +39,7 @@ int print_relaent(const Elf64_Rela *prela);
 /*** dynamic table section ***/
 int read_dyntbl(Elf64_Dyn *pdyn, Elf64_Half ndx, const Elf64_Shdr *psh);
 int print_dynent(const Elf64_Dyn *pdyn);
+int print_dyn_list(const Elf64_Shdr *psh);
+int get_d_tag(Elf64_Sxword d_tag, char* buf, size_t size);
 
 #endif

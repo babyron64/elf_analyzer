@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
-#include <elf.h>
+#include <linux/elf.h>
 
 #include "utils_cmd.h"
+#include "analy_sec.h"
 #include "analy_eval.h"
 #include "analy_cmd.h"
 #include "analy_utils.h"
