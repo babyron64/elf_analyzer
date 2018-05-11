@@ -91,7 +91,6 @@ print_sec_dump(const Elf64_Shdr* ps, DUMP_TYPE type) {
     return 0;
 }
 
-
 int
 read_sec_name(char *name, const Elf64_Shdr *ps, int size) {
     Elf64_Word str_ndx = ps->sh_name;
