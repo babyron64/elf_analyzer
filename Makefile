@@ -1,6 +1,6 @@
 CC=gcc
 MAKE=make --no-print-directory
-DEBUGS=-g -O0
+# DEBUGS=-g -O0
 
 BIN=./bin
 SRC=./src
