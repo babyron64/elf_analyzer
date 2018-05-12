@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <linux/elf.h>
 
+#define Elf_Byte __u8
+
 #define PRINT_STC(ptr, name, format, suffix) \
     printf( #name ":\t"  #format #suffix "\n", (ptr) -> name )
 #define PRINT_STC_WITH_NAME(ptr, name, format, suffix, val_name) \
