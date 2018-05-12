@@ -27,6 +27,7 @@ release() {
     release_ehdr();
     release_ptbl();
     release_stbl();
+    release_sec();
     return 0;
 }
 

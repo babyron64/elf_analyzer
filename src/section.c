@@ -28,6 +28,12 @@ release_stbl() {
     return 0;
 }
 
+int
+release_sec() {
+    release_eh_frame();
+    return 0;
+}
+
 const Elf64_Shdr*
 get_shdr(Elf64_Half ndx) {
     const Elf64_Ehdr *p_ehdr64 = get_ehdr();
