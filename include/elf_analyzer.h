@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <linux/elf.h>
+#include <stdint.h>
 
 #define Elf_Byte __u8
 
@@ -13,6 +14,8 @@
 
 #define FREE_IF_EXIST(ptr) \
     if ((ptr) != NULL) free(ptr)
+
+typedef uint8_t	Elf64_BYTE;
 
 void* load_elf(size_t size, Elf64_Off offset);
 int read_elf(void *ptr, size_t size, Elf64_Off offset);

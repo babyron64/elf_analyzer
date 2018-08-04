@@ -27,7 +27,7 @@ static EH_ENT_NODE* p_node;
 int
 load_eh_frame(const Elf64_Shdr* ps) {
     // preprocess for cache.
-    if (ps == p_eh_frame) {
+    if (ps == p_shdr) {
         return 0;
     } else if (p_eh_frame != NULL) {
         release_eh_frame();
@@ -65,7 +65,8 @@ load_eh_frame(const Elf64_Shdr* ps) {
         Elf64_Word cie_id = *((Elf64_Word*)(p_eh_frame + j));
 
         if (length == 0) {
-            current->ent.type = cie_id == 0 ? CIE : FDE;
+            /** current->ent.type = cie_id == 0 ? CIE : FDE; */
+            current->ent.type = CIE;
             break;
         }
 
@@ -77,7 +78,7 @@ load_eh_frame(const Elf64_Shdr* ps) {
             current->ent.type = FDE;
         }
 
-        i += length;
+        j += length;
         prev = current;
         current = (EH_ENT_NODE*)malloc(sizeof(EH_ENT_NODE));
         prev->next = current;
@@ -113,8 +114,8 @@ read_CIE_format(Elf64_Eh_Ent_CIE* pc, Elf64_Addr i) {
     pc->cie_id = *((Elf64_Word*)(p_eh_frame + i));
     i += 4;
 
-    pc->version = *((Elf64_Word*)(p_eh_frame + i));
-    i += 4;
+    pc->version = *((Elf64_BYTE*)(p_eh_frame + i));
+    i += 1;
 
     pc->aug = (Elf64_Addr)(p_eh_frame + i);
     while (((char*)p_eh_frame)[i] != '\0') i++;
@@ -156,12 +157,13 @@ read_CIE_format(Elf64_Eh_Ent_CIE* pc, Elf64_Addr i) {
 static int
 read_FDE_format(Elf64_Eh_Ent_FDE* pf, Elf64_Addr i) {
     Elf64_Addr base = i;
+    Elf64_Addr j = 0;
     pf->length = *((Elf64_Word*)(p_eh_frame + i));
-    i += 4;
+    i += 4; j += 4;
 
     if (pf->length == 0xffffffff) {
         pf->ex_length = *((Elf64_Xword*)(p_eh_frame + i));
-        i += 8;
+        i += 8; j += 8;
     }
     
     pf->cie_pointer = *((Elf64_Word*)(p_eh_frame + i));
@@ -173,7 +175,7 @@ read_FDE_format(Elf64_Eh_Ent_FDE* pf, Elf64_Addr i) {
     pf->pc_range = (Elf64_Addr)(p_eh_frame + i);
     i += 8; 
 
-    Elf64_Addr cie_base = base - pf->cie_pointer;
+    Elf64_Addr cie_base = ((Elf64_Addr)p_eh_frame) + base + j - pf->cie_pointer;
     EH_ENT_NODE* current = p_node;
     while (current != NULL) {
         if (current->base == cie_base) {
@@ -247,6 +249,11 @@ decode_sLEB128(Elf64_Addr p) {
 }
 
 int print_eh_ent(const Elf64_Eh_Ent *peh) {
+    if (!peh->eh_ent.info.length) {
+        printf("--- CIE_END ---\n");
+        return 0;
+    }
+
     if (peh->type == CIE) 
         return print_eh_ent_cie(&peh->eh_ent.cie);
     else
@@ -259,7 +266,10 @@ int print_eh_list(const Elf64_Shdr *psh) {
     int i = 0;
     EH_ENT_NODE* current = p_node;
     while (current) {
-        printf("%d:\t%s\n", i, current->ent.type == CIE ? "CIE" : "FDE");
+        if (current->ent.eh_ent.info.length)
+            printf("%d:\t%s\n", i, current->ent.type == CIE ? "CIE" : "FDE");
+        else 
+            printf("%d:\t%s\n", i, "END");
         current = current->next; i++;
     }
 
@@ -280,10 +290,14 @@ print_eh_ent_cie(const Elf64_Eh_Ent_CIE* pc) {
         printf("eh_data:\t%llxh\n", pc->eh_data);
 
     printf("code_align:\t%llxh\n", decode_uLEB128(pc->code_align));
-    printf("data_align:\t%llxh\n", decode_sLEB128(pc->data_align));
+    Elf64_Xword data_align;
+    if ((data_align = decode_sLEB128(pc->data_align)) & (1U << 8))
+        printf("data_align:\t-%llxh\n", -data_align);
+    else 
+        printf("data_align:\t%llxh\n", data_align);
     printf("return_addr:\t%llxh\n", decode_uLEB128(pc->return_addr));
 
-    if (((char*)pc->aug)[0] == 'z') {
+    if (pc->aug && ((char*)pc->aug)[0] == 'z') {
         printf("aug_len:\t%llu\n", decode_uLEB128(pc->aug_len));
         int i = 0;
         const char* p = (const char*)pc->aug;
