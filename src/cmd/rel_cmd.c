@@ -3,14 +3,14 @@
 #include <string.h>
 #include <linux/elf.h>
 
-#include "ehdr_cmd.h"
 #include "utils_cmd.h"
+#include "analy_eval.h"
 #include "analy_elf.h"
 #include "analy_sec.h"
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
 
-static int eval_rel_read(char **cmds);
+static int eval_rel_show(char **cmds);
 
 int
 eval_rel(char **cmds) {
@@ -21,24 +21,24 @@ eval_rel(char **cmds) {
 
     char *cmd = cmds[0];
     cmds++;
-    if (IS_TOK(cmd, read))
-        return eval_rel_read(cmds);
+    if (IS_TOK(cmd, show))
+        return eval_rel_show(cmds);
 
     eval_error("Unknown command");
     return -1;
 }
 
 static int
-eval_rel_read(char **cmds){
+eval_rel_show(char **cmds){
     int ndx = 0;
-    int str_ndx = 0;
+    int rel_ndx = 0;
 
     ndx = eval_ndx(cmds);
     if (ndx == -1) return -1;
     cmds++;
 
-    str_ndx = eval_ndx(cmds);
-    if (str_ndx == -1) return -1;
+    rel_ndx = eval_ndx(cmds);
+    if (rel_ndx == -1) return -1;
     cmds++;
 
     if (! is_last_cmd(cmds)) {
@@ -51,7 +51,7 @@ eval_rel_read(char **cmds){
         return -1;
     }
     Elf64_Rel *prel = (Elf64_Rel *)malloc(ps->sh_entsize);
-    if (read_reltbl(prel, str_ndx, ps) == -1) {
+    if (read_reltbl(prel, rel_ndx, ps) == -1) {
         FREE_IF_EXIST(prel);
         return -1;
     }

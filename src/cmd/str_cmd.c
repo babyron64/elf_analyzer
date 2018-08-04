@@ -3,15 +3,15 @@
 #include <string.h>
 #include <linux/elf.h>
 
-#include "ehdr_cmd.h"
 #include "utils_cmd.h"
+#include "analy_eval.h"
 #include "analy_sec.h"
 #include "analy_elf.h"
 #include "analy_cmd.h"
 #include "elf_analyzer.h"
 
+static int eval_str_list(char **cmds);
 static int eval_str_show(char **cmds);
-static int eval_str_read(char **cmds);
 
 int
 eval_str(char **cmds) {
@@ -22,17 +22,17 @@ eval_str(char **cmds) {
 
     char *cmd = cmds[0];
     cmds++;
-    if (IS_TOK(cmd, show))
+    if (IS_TOK(cmd, list))
+        return eval_str_list(cmds);
+    else if (IS_TOK(cmd, show))
         return eval_str_show(cmds);
-    else if (IS_TOK(cmd, read))
-        return eval_str_read(cmds);
 
     eval_error("Unknown command");
     return -1;
 }
 
 static int
-eval_str_show(char **cmds) {
+eval_str_list(char **cmds) {
     int ndx = 0;
 
     ndx = eval_ndx(cmds);
@@ -80,7 +80,7 @@ END: ;
 }
 
 static int
-eval_str_read(char **cmds) {
+eval_str_show(char **cmds) {
     int ndx = 0;
     int str_ndx = 0;
 
