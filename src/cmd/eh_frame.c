@@ -23,9 +23,9 @@ eval_eh(char **cmds) {
     char *cmd = cmds[0];
     cmds++;
     if (IS_TOK(cmd, show))
-        return eval_rel_show(cmds);
+        return eval_eh_show(cmds);
     else (IS_TOK(cmd, list))
-        return eval_rel_show(list);
+        return eval_eh_list(cmds);
 
     eval_error("Unknown command");
     return -1;
