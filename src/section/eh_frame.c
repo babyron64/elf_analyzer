@@ -214,7 +214,7 @@ get_eh_frame_ent(const Elf64_Shdr *ps, Elf64_Half ndx) {
 
     EH_ENT_NODE* current = p_node;
     for (int i=0; i<ndx; i++) {
-        if (current)
+        if (!current)
            return NULL; 
         current = current->next;
     }
@@ -258,7 +258,7 @@ int print_eh_list(const Elf64_Shdr *psh) {
 
     int i = 0;
     EH_ENT_NODE* current = p_node;
-    while (current != NULL) {
+    while (current) {
         printf("%d:\t%s\n", i, current->ent.type == CIE ? "CIE" : "FDE");
         current = current->next; i++;
     }
