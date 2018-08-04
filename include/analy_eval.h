@@ -33,4 +33,7 @@ int eval_rela(char **cmds);
 /** dyn **/
 int eval_dyn(char **cmds);
 
+/** eh_frame **/
+int eval_eh(char **cmds);
+
 #endif

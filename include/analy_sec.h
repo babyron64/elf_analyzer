@@ -95,7 +95,7 @@ typedef struct _Elf64_Eh_Ent {
 
 int load_eh_frame(const Elf64_Shdr* ps);
 int release_eh_frame();
-Elf64_Eh_Ent* get_eh_frame_ent(const Elf64_Shdr *ps, Elf64_Half ndx, size_t size);
+Elf64_Eh_Ent* get_eh_frame_ent(const Elf64_Shdr *ps, Elf64_Half ndx);
 int print_eh_ent(const Elf64_Eh_Ent *peh);
 int print_eh_list(const Elf64_Shdr *psh);
 

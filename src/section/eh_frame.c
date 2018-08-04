@@ -202,13 +202,15 @@ read_FDE_format(Elf64_Eh_Ent_FDE* pf, Elf64_Addr i) {
 }
 
 Elf64_Eh_Ent*
-get_eh_frame_ent(const Elf64_Shdr *ps, Elf64_Half ndx, size_t size) {
+get_eh_frame_ent(const Elf64_Shdr *ps, Elf64_Half ndx) {
     char buf[16];
     read_sec_name(buf, ps, 16);
     if (strcmp(buf, ".eh_frame") != 0) {
         fprintf(stderr, "The section is not a eh_frame\n");
         return NULL;
     }
+
+    load_eh_frame(ps);
 
     EH_ENT_NODE* current = p_node;
     for (int i=0; i<ndx; i++) {
