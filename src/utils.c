@@ -121,8 +121,14 @@ asc_dump(size_t size, Elf64_Addr offset) {
     /**
      * asc=****\n
      ***/
-    for (int i=0; i<size; i++, pb++) {
+    for (int i=1; i<=size; i++, pb++) {
         printf("%c", asc_byte2char(*pb));
+        if (!(i & 0b111)) {
+            if (i & 0b111111)
+                printf("   ");
+            else
+                printf("\n");
+        }
     }
     printf("\n");
 
