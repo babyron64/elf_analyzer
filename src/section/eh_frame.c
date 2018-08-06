@@ -5,14 +5,14 @@
 #include <linux/types.h>
 
 #include "analy_sec.h"
+#include "analy_debug.h"
 #include "elf_analyzer.h"
 
 static int read_CIE_format(Elf64_Eh_Ent_CIE* pc, Elf64_Addr i);
 static int read_FDE_format(Elf64_Eh_Ent_FDE* pf, Elf64_Addr i);
-static Elf64_Xword decode_uLEB128(Elf64_Addr p);
-static Elf64_Sxword decode_sLEB128(Elf64_Addr p);
 static int print_eh_ent_cie(const Elf64_Eh_Ent_CIE* pc);
 static int print_eh_ent_fde(const Elf64_Eh_Ent_FDE* pf);
+static int print_CFI_array(Elf64_Addr code, Elf64_Xword size);
 
 typedef struct _EH_ENT_NODE {
     struct _EH_ENT_NODE* next;
@@ -103,18 +103,23 @@ release_eh_frame() {
 
 static int
 read_CIE_format(Elf64_Eh_Ent_CIE* pc, Elf64_Addr i) {
+    Elf64_Xword total_len = 0;
+    Elf64_Addr base = i;
     pc->length = *((Elf64_Word*)(p_eh_frame + i));
-    i += 4;
+    i += 4; total_len += 4;
 
     if (pc->length == 0xffffffff) {
         pc->ex_length = *((Elf64_Xword*)(p_eh_frame + i));
-        i += 8;
+        i += 8; total_len += 8;
+        total_len += pc->ex_length;
+    } else {
+        total_len += pc->length;
     }
     
     pc->cie_id = *((Elf64_Word*)(p_eh_frame + i));
     i += 4;
 
-    pc->version = *((Elf64_BYTE*)(p_eh_frame + i));
+    pc->version = *((Elf64_Byte*)(p_eh_frame + i));
     i += 1;
 
     pc->aug = (Elf64_Addr)(p_eh_frame + i);
@@ -129,33 +134,45 @@ read_CIE_format(Elf64_Eh_Ent_CIE* pc, Elf64_Addr i) {
     }
 
     pc->code_align = (Elf64_Addr)(p_eh_frame + i);
-    while ((((Elf_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
+    while ((((Elf64_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
     i++;
 
     pc->data_align = (Elf64_Addr)(p_eh_frame + i);
-    while ((((Elf_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
+    while ((((Elf64_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
     i++;
 
-    pc->return_addr = (Elf64_Addr)(p_eh_frame + i);
-    while ((((Elf_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
+    pc->return_reg = (Elf64_Addr)(p_eh_frame + i);
+    while ((((Elf64_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
     i++;
 
-    if (((char*)pc->aug)[0] == 'z') {
-        pc->aug_len = (Elf64_Addr)(p_eh_frame + i);
-        while ((*((Elf_Byte*)(p_eh_frame + i)) & 0x80) != 0) i++;
-        i++;
+    pc->aug_data = (Elf64_Addr)(p_eh_frame + i);
 
-        pc->aug_data = (Elf64_Addr)(p_eh_frame + i);
-        i += decode_uLEB128(pc->aug_len);
+    char *aug = (char*)pc->aug;
+    if (aug && aug[0] == 'z') {
+        while (*aug) {
+            if (*aug == 'z') {
+                pc->aug_z = (Elf64_Addr)(p_eh_frame + i);
+                while ((((Elf64_Byte*)p_eh_frame)[i++] & 0x80) != 0);
+            } else if (*aug == 'L') {
+                pc->aug_L = ((Elf64_Byte*)p_eh_frame)[i++];
+            } else if (*aug == 'P') {
+                pc->aug_P = ((Elf64_Byte*)p_eh_frame)[i++];
+            } else if (*aug == 'R') {
+                pc->aug_R = ((Elf64_Byte*)p_eh_frame)[i++];
+            }
+            aug++;
+        }
     }
 
     pc->init = (Elf64_Addr)(p_eh_frame + i);
+    pc->init_len = total_len - (i - base);
     
     return 0;
 }
 
 static int
 read_FDE_format(Elf64_Eh_Ent_FDE* pf, Elf64_Addr i) {
+    Elf64_Xword total_len = 0;
     Elf64_Addr base = i;
     Elf64_Addr j = 0;
     pf->length = *((Elf64_Word*)(p_eh_frame + i));
@@ -164,42 +181,77 @@ read_FDE_format(Elf64_Eh_Ent_FDE* pf, Elf64_Addr i) {
     if (pf->length == 0xffffffff) {
         pf->ex_length = *((Elf64_Xword*)(p_eh_frame + i));
         i += 8; j += 8;
+        total_len = j + pf->ex_length;
+    } else {
+        total_len = j + pf->length;
     }
     
     pf->cie_pointer = *((Elf64_Word*)(p_eh_frame + i));
     i += 4;
 
-    pf->pc_begin = (Elf64_Addr)(p_eh_frame + i);
-    i += 8;
-
-    pf->pc_range = (Elf64_Addr)(p_eh_frame + i);
-    i += 8; 
-
     Elf64_Addr cie_base = ((Elf64_Addr)p_eh_frame) + base + j - pf->cie_pointer;
     EH_ENT_NODE* current = p_node;
+    pf->cie_idx = 0;
     while (current != NULL) {
         if (current->base == cie_base) {
             pf->cie = &current->ent.eh_ent.cie;
             break;
         }
         current = current->next;
+        pf->cie_idx++;
     }
 
     if (pf->cie == NULL) {
         fprintf(stderr, "The associated CIE is not found\n");
-    } else {
-        if (((char*)pf->cie->aug)[0] == 'z') {
-            pf->aug_len = (Elf64_Addr)(p_eh_frame + i);
-            while ((((Elf_Byte*)p_eh_frame)[i] & 0x80) != 0) i++;
-            i++;
+        return -1;
+    }
 
-            pf->aug_data = (Elf64_Addr)(p_eh_frame + i);
-            i += decode_uLEB128(pf->aug_len);
+    if (pf->cie->aug_R) {
+        if (((pf->cie->aug_R & 0x0f) == EH_PE_uleb128) ||
+                ((pf->cie->aug_R & 0x0f) == EH_PE_sleb128)) {
+            pf->pc_begin = (Elf64_Addr)(p_eh_frame + i);
+            while ((((Elf64_Byte*)p_eh_frame)[i++] & 0x80) != 0);
+            pf->pc_range = (Elf64_Addr)(p_eh_frame + i);
+            while ((((Elf64_Byte*)p_eh_frame)[i++] & 0x80) != 0);
+        } else if (((pf->cie->aug_R & 0x0f) == EH_PE_udata2) ||
+                ((pf->cie->aug_R & 0x0f) == EH_PE_sdata2)) {
+            pf->pc_begin = *(Elf64_Half*)(p_eh_frame + i);
+            i += 2;
+            pf->pc_range = *(Elf64_Half*)(p_eh_frame + i);
+            i += 2; 
+        } else if (((pf->cie->aug_R & 0x0f) == EH_PE_udata4) ||
+                ((pf->cie->aug_R & 0x0f) == EH_PE_sdata4)) {
+            pf->pc_begin = *(Elf64_Word*)(p_eh_frame + i);
+            i += 4;
+            pf->pc_range = *(Elf64_Word*)(p_eh_frame + i);
+            i += 4; 
+        } else if (((pf->cie->aug_R & 0x0f) == EH_PE_udata8) ||
+                ((pf->cie->aug_R & 0x0f) == EH_PE_sdata8) ||
+                ((pf->cie->aug_R & 0x0f) == EH_PE_signed)) {
+            pf->pc_begin = *(Elf64_Xword*)(p_eh_frame + i);
+            i += 8;
+            pf->pc_range = *(Elf64_Xword*)(p_eh_frame + i);
+            i += 8; 
+        } else {
+            pf->pc_begin = *(Elf64_Xword*)(p_eh_frame + i);
+            i += 8;
+            pf->pc_range = *(Elf64_Xword*)(p_eh_frame + i);
+            i += 8; 
         }
     }
 
+
+    if (pf->cie->aug_z) {
+        pf->aug_z = (Elf64_Addr)(p_eh_frame + i);
+        while ((((Elf64_Byte*)p_eh_frame)[i++] & 0x80) != 0);
+
+        pf->aug_data = (Elf64_Addr)(p_eh_frame + i);
+        i += decode_uLEB128(pf->aug_z);
+    }
+
     pf->cfi = (Elf64_Addr)(p_eh_frame + i);
-    
+    pf->cfi_len = total_len - (i - base);
+
     return 0;
 }
 
@@ -220,32 +272,11 @@ get_eh_frame_ent(const Elf64_Shdr *ps, Elf64_Half ndx) {
            return NULL; 
         current = current->next;
     }
+    if (!current)
+        return NULL;
 
     // current is allocated by malloc, so current->ent is not located in stack memory.
     return &(current->ent);
-}
-
-static Elf64_Xword
-decode_uLEB128(Elf64_Addr p) {
-    Elf64_Xword num = 0;
-    int i = 0;
-    do num += (*((Elf_Byte*)p) & 0x7f) << ((i++) * 7); while ((*((Elf_Byte*)p++) & 0x80) != 0);
-    return num;
-}
-
-static Elf64_Sxword
-decode_sLEB128(Elf64_Addr p) {
-    Elf64_Xword num = 0;
-    int i = 0;
-    while ((*((Elf_Byte*)p) & 0x80) != 0) {
-        num += (*((Elf_Byte*)p) & 0x7f) << ((i) * 7);
-        p++; i++;
-    }
-    num += (*((Elf_Byte*)p) & 0x7f) << ((i) * 7);
-    // signed expansion
-    if ((*((Elf_Byte*)p) & 0x40) != 0)
-        num += -1 << ((i+1)*7);
-    return num;
 }
 
 int print_eh_ent(const Elf64_Eh_Ent *peh) {
@@ -295,28 +326,20 @@ print_eh_ent_cie(const Elf64_Eh_Ent_CIE* pc) {
         printf("data_align:\t-%llxh\n", -data_align);
     else 
         printf("data_align:\t%llxh\n", data_align);
-    printf("return_addr:\t%llxh\n", decode_uLEB128(pc->return_addr));
+    printf("return_reg:\t%llxh\n", decode_uLEB128(pc->return_reg));
 
-    if (pc->aug && ((char*)pc->aug)[0] == 'z') {
-        printf("aug_len:\t%llu\n", decode_uLEB128(pc->aug_len));
-        int i = 0;
-        const char* p = (const char*)pc->aug;
-        while (*p != '\0') {
-            if (*p == 'L') {
-                printf("aug_data_L:\t%xh\n", *(Elf_Byte*)(pc->aug_data + i));
-                i += 1;
-            } else if (*p == 'P') {
-                printf("aug_data_P:\t%xh\n", *(Elf64_Half*)(pc->aug_data + i));
-                i += 2;
-            } else if (*p == 'R') {
-                printf("aug_data_R:\t%xh\n", *(Elf_Byte*)(pc->aug_data + i));
-                i += 1;
-            }
-            p++;
-        }
-    }
+    if (pc->aug_z)
+        printf("aug_z:\t%llu\n", decode_uLEB128(pc->aug_z));
+    if (pc->aug_L)
+        printf("aug_L:\t%xh\n", pc->aug_L);
+    if (pc->aug_R)
+        printf("aug_R:\t%xh\n", pc->aug_R);
+    if (pc->aug_P)
+        printf("aug_P:\t%xh\n", pc->aug_P);
 
-    PRINT_STC(pc, init, %llx, h);
+    /** PRINT_STC(pc, init, %llx, h); */
+    printf("init:\n");
+    print_CFI_array(pc->init, pc->init_len);
 
     return 0;
 }
@@ -327,20 +350,68 @@ print_eh_ent_fde(const Elf64_Eh_Ent_FDE* pf) {
     PRINT_STC(pf, length, %u,);
     if (pf->ex_length != 0)
         PRINT_STC(pf, ex_length, %llu,);
-    PRINT_STC(pf, cie_pointer, %x, h);
+    printf("parent_cie:\t%llu (%xh)\n", pf->cie_idx, pf->cie_pointer);
 
-    PRINT_STC(pf, pc_begin, %llx, h);
-    PRINT_STC(pf, pc_range, %llx, h);
+    if (pf->cie->aug_R) {
+        Elf64_Sxword s_pc_begin;
+        Elf64_Sxword s_pc_range;
+        switch (pf->cie->aug_R & 0x0f) {
+            case EH_PE_uleb128:
+                printf("pc_begin:\t%llxh\n", decode_uLEB128(pf->pc_begin));
+                printf("pc_range:\t%llxh\n", decode_uLEB128(pf->pc_range));
+                break;
+            case EH_PE_sleb128:
+                s_pc_begin = decode_sLEB128(pf->pc_begin);
+                s_pc_range = decode_sLEB128(pf->pc_range);
+                goto EH_PE_SIGNED_ENCODE;
+            case EH_PE_signed:
+                s_pc_begin = (Elf64_Sxword)pf->pc_begin;
+                s_pc_range = (Elf64_Sxword)pf->pc_range;
+                goto EH_PE_SIGNED_ENCODE;
+            case EH_PE_sdata2:
+                s_pc_begin = (Elf64_SHalf)pf->pc_begin;
+                s_pc_range = (Elf64_SHalf)pf->pc_range;
+                goto EH_PE_SIGNED_ENCODE;
+            case EH_PE_sdata4:
+                s_pc_begin = (Elf64_Sword)pf->pc_begin;
+                s_pc_range = (Elf64_Sword)pf->pc_range;
+                goto EH_PE_SIGNED_ENCODE;
+            case EH_PE_sdata8:
+                s_pc_begin = (Elf64_Sxword)pf->pc_begin;
+                s_pc_range = (Elf64_Sxword)pf->pc_range;
+                goto EH_PE_SIGNED_ENCODE;
+            EH_PE_SIGNED_ENCODE:
+                if (s_pc_begin < 0)
+                    printf("pc_begin:\t-%llxh\n", -s_pc_begin);
+                else
+                    printf("pc_begin:\t%llxh\n", s_pc_begin);
+                if (s_pc_range < 0)
+                    printf("pc_range:\t-%llxh\n", -s_pc_range);
+                else
+                    printf("pc_range:\t%llxh\n", s_pc_range);
+                break;
+            case EH_PE_udata2:
+            case EH_PE_udata4:
+            case EH_PE_udata8:
+            default:
+                printf("pc_begin:\t%llxh\n", pf->pc_begin);
+                printf("pc_range:\t%llxh\n", pf->pc_range);
+                break;
+        }
+    } else {
+        PRINT_STC(pf, pc_begin, %llx, h);
+        PRINT_STC(pf, pc_range, %llx, h);
+    }
 
     if (pf->cie != NULL) {
         Elf64_Eh_Ent_CIE* pc = pf->cie;
-        if (((char*)pc->aug)[0] == 'z') {
-            printf("aug_len:\t%llu\n", decode_uLEB128(pf->aug_len));
+        if (pc->aug_z) {
+            printf("aug_z:\t%llu\n", decode_uLEB128(pf->aug_z));
             int i = 0;
             const char* p = (const char*)pc->aug;
             while (*p != '\0') {
                 if (*p == 'L') {
-                    printf("aug_data_L:\t%xh\n", *(Elf_Byte*)(pf->aug_data + i));
+                    printf("aug_data_L:\t%xh\n", *(Elf64_Byte*)(pf->aug_data + i));
                     i += 1;
                 }
                 p++;
@@ -348,6 +419,21 @@ print_eh_ent_fde(const Elf64_Eh_Ent_FDE* pf) {
         }
     }
 
-    PRINT_STC(pf, cfi, %llx, h);
+    /** PRINT_STC(pf, cfi, %llx, h); */
+    printf("cfi:\n");
+    print_CFI_array(pf->cfi, pf->cfi_len);
+    return 0;
+}
+
+static int
+print_CFI_array(Elf64_Addr code, Elf64_Xword size) {
+    CFI_Handle handle = getCFIHandle(code);
+    CFI_Instruction ins;
+    Elf64_Xword i = 0;
+    while (handle.current < handle.base + size) {
+        read_CFI(&handle, &ins);
+        printf("\t%llu:\t", i++);
+        print_CFI(&ins);
+    }
     return 0;
 }

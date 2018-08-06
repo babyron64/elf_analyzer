@@ -7,7 +7,7 @@ SRC=./src
 INC=./include
 BUILD=./build
 
-SRCS=$(wildcard $(SRC)/*.c) $(wildcard $(SRC)/section/*.c) $(wildcard $(SRC)/cmd/*.c)
+SRCS=$(wildcard $(SRC)/*.c) $(wildcard $(SRC)/section/*.c) $(wildcard $(SRC)/cmd/*.c) $(wildcard $(SRC)/debug/*.c)
 HDRS=$(wildcard $(INC)/*.h)
 OBJS=$(patsubst $(SRC)/%.c, $(BIN)/%.o, $(SRCS))
 
@@ -19,13 +19,13 @@ SNIPS=$(patsubst $(SNIP_SRC)/%, $(SNIP_INC)/%.sni, $(SNIP_SRCS))
 
 FLAGS=-I $(INC) -I $(INC)/cmd -I $(SNIP_INC) -Wall $(DEBUGS)
 
-OUTPUT=./bin/elf_analy.out
+OUTPUT=elf_analy.out
 BIN_INSTALL_PATH=/usr/local/bin/elf_analy
 
-.PHONY: all install uninstall clean
+.PHONY: all install uninstall clean count
 # .PRECIOUS: $(SNIPS)
 
-all: $(BIN) $(BIN)/section $(BIN)/cmd $(OUTPUT)
+all: $(BIN)/section $(BIN)/cmd $(BIN)/debug $(BIN) $(OUTPUT)
 
 install:
 	cp $(OUTPUT) $(BIN_INSTALL_PATH)
@@ -36,11 +36,14 @@ uninstall:
 clean:
 	rm -rf $(BIN)/*
 
+count:
+	wc $(SRCS) $(HDRS)
+
 $(OUTPUT): $(OBJS)
 	$(CC) $(DEBUGS) $(FLAGS) $(OBJS) -o $(OUTPUT)
 
 $(BIN)/%.o: $(SRC)/%.c $(HDRS) $(SNIPS)
-	$(CC) $(FLAGS) -c $< -o $@
+	$(CC) $(DEBUGS) $(FLAGS) -c $< -o $@
 
 $(SNIP_INC)/%.sni: $(SNIP_SRC)/%
 	python3 $(BUILD)/mkIfElse.py $< $@ sni_value sni_name
@@ -49,4 +52,7 @@ $(BIN)/section:
 	mkdir $@
 
 $(BIN)/cmd:
+	mkdir $@
+
+$(BIN)/debug:
 	mkdir $@

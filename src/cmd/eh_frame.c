@@ -55,7 +55,10 @@ eval_eh_show(char **cmds){
     }
 
     Elf64_Eh_Ent *peh;
-    if (!(peh = get_eh_frame_ent(ps, eh_ndx))) return -1;
+    if (!(peh = get_eh_frame_ent(ps, eh_ndx))) {
+        eval_error("No such an entry");
+        return -1;
+    }
 
     print_eh_ent(peh);
 

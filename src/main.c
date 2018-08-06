@@ -28,7 +28,6 @@ release() {
     release_ptbl();
     release_stbl();
     release_sec();
-    release_eh_frame();
     return 0;
 }
 
