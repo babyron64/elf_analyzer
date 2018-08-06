@@ -24,11 +24,17 @@ hex_dump(size_t size, Elf64_Addr offset) {
      * hex=** ** ** \n
      ***/
     char str[8];
-    for (int i=0; i<size; i++, pb++) {
+    for (int i=1; i<=size; i++, pb++) {
         hex_byte2char(str, *pb); 
         str[2] = ' ';
         str[3] = '\0';
         printf("%s", str);
+        if (!(i & 0b111)) {
+            if (i & 0b11111)
+                printf("   ");
+            else
+                printf("\n");
+        }
     }
     printf("\n");
 
@@ -66,11 +72,17 @@ bin_dump(size_t size, Elf64_Addr offset) {
      * bin=******** ******** ******** \n
      **/
     char str[16];
-    for (int i=0; i<size; i++, pb++) {
+    for (int i=1; i<=size; i++, pb++) {
         bin_byte2char(str, *pb);
         str[8] = ' ';
         str[9] = '\0';
         printf("%s", str);
+        if (!(i & 0b111)) {
+            if (i & 0b1111)
+                printf("   ");
+            else
+                printf("\n");
+        }
     }
     printf("\n");
 
@@ -109,8 +121,14 @@ asc_dump(size_t size, Elf64_Addr offset) {
     /**
      * asc=****\n
      ***/
-    for (int i=0; i<size; i++, pb++) {
+    for (int i=1; i<=size; i++, pb++) {
         printf("%c", asc_byte2char(*pb));
+        if (!(i & 0b111)) {
+            if (i & 0b111111)
+                printf("   ");
+            else
+                printf("\n");
+        }
     }
     printf("\n");
 

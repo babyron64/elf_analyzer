@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <linux/elf.h>
+#include <stdint.h>
 
 #define PRINT_STC(ptr, name, format, suffix) \
     printf( #name ":\t"  #format #suffix "\n", (ptr) -> name )
@@ -11,6 +12,8 @@
 
 #define FREE_IF_EXIST(ptr) \
     if ((ptr) != NULL) free(ptr)
+
+#define Elf64_Byte __u8
 
 void* load_elf(size_t size, Elf64_Off offset);
 int read_elf(void *ptr, size_t size, Elf64_Off offset);
