@@ -45,12 +45,13 @@ This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a 
 - sec list
 - sec dump index(shdr) [hex|h|bin|b|ascii|asc|a]
 ### string table
-- str show index(shdr)
-- str read index(shdr) index(strtbl)
+- str list index(shdr)
+- str show index(shdr) index(strtbl)
 ### symbol table
-- sym read index(shdr) index(symtbl)
+- sym list index(shdr)
+- sym show index(shdr) index(symtbl)
 ### relocation without addends table
-- rel read index(shdr) index(reltbl)
+- rel show index(shdr) index(reltbl)
 ### relocation with addends table
 - rela read index(shdr) index(relatbl)
 ### dynamic table
