@@ -55,11 +55,11 @@ This invokes an analyzer prompt: `(elf_analyzer)`. When prompt appears, enter a 
 ### relocation with addends table
 - rela read index(shdr) index(relatbl)
 ### dynamic table
-- dyn show index(shdr) index(dyntbl)
 - dyn list index(shdr)
+- dyn show index(shdr) index(dyntbl)
 ### eh_frame
-- eh show index(shdr) index(eh_frame)
 - eh list index(shdr)
+- eh show index(shdr) index(eh_frame)
 
 ---
 - index(***): index of the entry in *** table(tbl)
