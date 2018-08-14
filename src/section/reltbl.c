@@ -21,6 +21,16 @@ print_relent(const Elf64_Rel *prel) {
     printf("--- RELOCATON without ADDEND TABLE ENTRY ---\n");
     PRINT_STC(prel, r_offset, %llx, h);
     PRINT_STC(prel, r_info, %llx, h);
+    {
+        printf("\tr_sym:\t%lld\n", ELF64_R_SYM(prel->r_info));
+
+        int sni_value;
+        char *sni_name;
+
+        sni_value = ELF64_R_TYPE(prel->r_info);
+#include "st_bind.sni"
+        printf("\tr_type:\t%s\n", sni_name);
+    }
 
     return 0;
 }

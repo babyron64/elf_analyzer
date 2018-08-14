@@ -21,6 +21,16 @@ print_relaent(const Elf64_Rela *prela) {
     printf("--- RELOCATON with ADDEND TABLE ENTRY ---\n");
     PRINT_STC(prela, r_offset, %llx, h);
     PRINT_STC(prela, r_info, %llx, h);
+    {
+        printf("\tr_sym:\t%lld\n", ELF64_R_SYM(prela->r_info));
+
+        int sni_value;
+        char *sni_name = "";
+
+        sni_value = ELF64_R_TYPE(prela->r_info);
+#include "r_type.sni"
+        printf("\tr_type:\t%s\n", sni_name);
+    }
     PRINT_STC(prela, r_addend, %lld, );
 
     return 0;
