@@ -8,7 +8,8 @@
 
 int
 read_symtbl(Elf64_Sym *psym, Elf64_Half ndx, const Elf64_Shdr *psh) {
-    if (psh->sh_type != SHT_SYMTAB) {
+    if (psh->sh_type != SHT_SYMTAB &&
+        psh->sh_type != SHT_DYNSYM) {
         fprintf(stderr, "The section is not a symbol table\n");
         return -1;
     }
@@ -30,7 +31,22 @@ print_syment(const Elf64_Shdr* psh, int ndx) {
     if (buf[0] == '\0')
         strcpy(buf,"No name");
     PRINT_STC_WITH_NAME(&sym, st_name, %d,, buf);
+
     PRINT_STC(&sym, st_info, %hhx, h);
+
+    {
+        int sni_value;
+        char *sni_name;
+
+        sni_value = ELF64_ST_BIND(sym.st_info);
+#include "st_bind.sni"
+        printf("\tst_bind:\t%s\n", sni_name);
+
+        sni_value = ELF64_ST_TYPE(sym.st_info);
+#include "st_type.sni"
+        printf("\tst_type:\t%s\n", sni_name);
+    }
+
     PRINT_STC(&sym, st_other, %hhx, h);
     PRINT_STC(&sym, st_shndx, %hd, );
     PRINT_STC(&sym, st_value, %llx, h);
