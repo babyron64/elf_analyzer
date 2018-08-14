@@ -48,8 +48,30 @@ print_shdr(const Elf64_Shdr *ps) {
     printf("--- SECTION HEADER ENTRY ---\n");
     read_sec_name(buf, ps, 16);
     PRINT_STC_WITH_NAME(ps, sh_name, %x, h, buf);
-    PRINT_STC(ps, sh_type, %x, h);
-    PRINT_STC(ps, sh_flags, %llx, h);
+    {
+        printf("sh_type:\t");
+        int sni_value = ps->sh_type;
+        char *sni_name;
+#include "sh_type.sni"
+        printf("%s ", sni_name);
+        printf("(%xh)\n", ps->sh_type);
+    }
+    {
+        printf("sh_flags:\t");
+        if (ps->sh_flags & SHF_WRITE)
+            printf("SHF_WRITE ");
+        if (ps->sh_flags & SHF_ALLOC)
+            printf("SHF_ALLOC ");
+        if (ps->sh_flags & SHF_EXECINSTR)
+            printf("SHF_EXECINSTR ");
+        if (ps->sh_flags & SHF_MASKPROC)
+            printf("SHF_MASKPROC ");
+        /** if (ps->sh_flags & SHF_RELA_LIVEPATCH) */
+        /**     printf("SHF_RELA_LIVEPATCH "); */
+        /** if (ps->sh_flags & SHF_RO_AFTER_INIT) */
+        /**     printf("SHF_RO_AFTER_INIT "); */
+        printf("(%llxh)\n", ps->sh_flags);
+    }
     PRINT_STC(ps, sh_addr, %llx, h);
     PRINT_STC(ps, sh_offset, %llx, h);
     PRINT_STC(ps, sh_size, %lld, );
